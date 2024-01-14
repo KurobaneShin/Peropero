@@ -25,7 +25,6 @@ export const loader = async () => {
 		console.log(error)
 		throw error
 	}
-	console.log(data[0].mangas_authors[0].authors?.name)
 	return { mangas: data }
 }
 
