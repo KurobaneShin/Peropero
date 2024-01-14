@@ -11,7 +11,11 @@ import { InputWithLabel } from "~/components/custom/inputWithLabel"
 import { Input } from "~/components/ui/input"
 import { AlbumArtwork } from "./_index/components/album"
 import { Combobox } from "~/components/custom/multipleCombobox"
-import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node"
+import {
+	ActionFunctionArgs,
+	LoaderFunctionArgs,
+	redirect,
+} from "@remix-run/node"
 import { supabase, superSupabase } from "~/infra/supabase"
 import { Label } from "@radix-ui/react-label"
 import { Button } from "~/components/ui/button"
@@ -59,11 +63,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 			return { errors }
 		}
 
-		const testFormData = await request.clone().formData()
-		console.log("em cima", testFormData.getAll("file"))
-		const files = testFormData.getAll("file")
-
-		const uploadPromises = files.map(async (file) => {
+		const uploadPromises = data.file.map(async (file) => {
 			return superSupabase.storage
 				.from("pages")
 				.upload(`pages-${Math.random().toString(36).substring(7)}.jpg`, file)
@@ -72,9 +72,46 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 				})
 		})
 		const uploadResults = await Promise.all(uploadPromises)
-		console.log(uploadResults)
 
-		return null
+		const { data: newManga, error: mangaError } = await supabase
+			.from("mangas")
+			.insert({
+				title: data.title,
+				cover: `http://127.0.0.1:54321/storage/v1/object/public/pages/${uploadResults[0]}`,
+			})
+			.select()
+
+		if (mangaError) {
+			console.log(mangaError)
+			return { errors: mangaError }
+		}
+
+		const authorsToInsert = Array.isArray(data.authors)
+			? data.authors
+			: [data.authors]
+
+		const tagsToInsert = Array.isArray(data.tags) ? data.tags : [data.tags]
+
+		const authorsInsert = authorsToInsert.map((author) => ({
+			manga: newManga?.[0]?.id as number,
+			author: Number(author),
+		}))
+
+		const tagsInsert = tagsToInsert.map((tag) => ({
+			manga: newManga?.[0]?.id,
+			tag: Number(tag),
+		}))
+
+		const authorsInsertPromise = authorsInsert.map((author) =>
+			supabase.from("mangas_authors").insert(author),
+		)
+		const tagsInsertPromise = tagsInsert.map((tag) =>
+			supabase.from("mangas_tags").insert(tag),
+		)
+
+		await Promise.all([...authorsInsertPromise, ...tagsInsertPromise])
+
+		return redirect("/")
 	} catch (e) {
 		console.log(e)
 		return e
@@ -104,7 +141,7 @@ export default function New() {
 			/>
 
 			{artists.map((artist) => (
-				<input key={artist} type="hidden" name="artists" value={artist} />
+				<input key={artist} type="hidden" name="authors" value={artist} />
 			))}
 
 			<p className="text-sm text-muted-foreground">
@@ -128,6 +165,8 @@ export default function New() {
 			<p className="text-sm text-muted-foreground">
 				Tag no found? <Link to="/tags/new">click here!</Link> to add
 			</p>
+
+			<Label>Pages</Label>
 
 			<Input
 				type="file"
