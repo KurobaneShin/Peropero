@@ -11,9 +11,22 @@ import { InputWithLabel } from "~/components/custom/inputWithLabel"
 import { Input } from "~/components/ui/input"
 import { AlbumArtwork } from "./_index/components/album"
 import { Combobox } from "~/components/custom/multipleCombobox"
-import { LoaderFunctionArgs } from "@remix-run/node"
-import { supabase } from "~/infra/supabase"
+import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node"
+import { supabase, superSupabase } from "~/infra/supabase"
 import { Label } from "@radix-ui/react-label"
+import { Button } from "~/components/ui/button"
+import { makeForm } from "~/lib/makeForm"
+import { z } from "zod"
+import { zfd } from "zod-form-data"
+
+const { parse } = makeForm(
+	z.object({
+		title: zfd.text(),
+		authors: z.array(z.string()).or(z.string()),
+		tags: z.array(z.string()).or(z.string()),
+		file: z.array(z.instanceof(Blob)),
+	}),
+)
 
 export const loader = async (args: LoaderFunctionArgs) => {
 	const authorsPromise = supabase.from("authors").select("*")
@@ -36,6 +49,38 @@ export const loader = async (args: LoaderFunctionArgs) => {
 	return { authors: formattedAuthors, tags: formattedTags }
 }
 
+export const action = async ({ request, params }: ActionFunctionArgs) => {
+	try {
+		const { data, errors } = parse(await request.formData())
+		console.log(data)
+
+		if (errors) {
+			console.log(errors)
+			return { errors }
+		}
+
+		const testFormData = await request.clone().formData()
+		console.log("em cima", testFormData.getAll("file"))
+		const files = testFormData.getAll("file")
+
+		const uploadPromises = files.map(async (file) => {
+			return superSupabase.storage
+				.from("pages")
+				.upload(`pages-${Math.random().toString(36).substring(7)}.jpg`, file)
+				.then((res) => {
+					return res.data?.path
+				})
+		})
+		const uploadResults = await Promise.all(uploadPromises)
+		console.log(uploadResults)
+
+		return null
+	} catch (e) {
+		console.log(e)
+		return e
+	}
+}
+
 export default function New() {
 	const { authors, tags } = useLoaderData<typeof loader>()
 	const { pathname } = useLocation()
@@ -44,8 +89,9 @@ export default function New() {
 	const [artists, setArtists] = useState<string[]>([])
 	const [selectedTags, setSelectedTags] = useState<string[]>([])
 	return (
-		<Form method="post" action={pathname}>
+		<Form method="post" action={pathname} encType="multipart/form-data">
 			<InputWithLabel label="Titulo" name="title" />
+
 			<Label>Authors</Label>
 			<Combobox
 				options={authors}
@@ -88,6 +134,7 @@ export default function New() {
 				name="file"
 				multiple
 				onChange={(e) => {
+					console.log(e.target.files)
 					const files = Array.from(e.target.files || [])
 					setFiles(files)
 				}}
@@ -109,6 +156,7 @@ export default function New() {
 					/>
 				))}
 			</div>
+			<Button type="submit">Submit</Button>
 		</Form>
 	)
 }
