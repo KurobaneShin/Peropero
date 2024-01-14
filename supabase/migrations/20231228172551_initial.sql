@@ -17,13 +17,14 @@ create table mangas_authors (
 );
 
 create table tags (
+  id serial primary key,
   title text not null,
   created_at timestamptz not null default now()
 );
 
 create table mangas_tags (
   manga integer not null references mangas(id),
-  tag interger not null references tags(id)
+  tag integer not null references tags(id)
 );
 
 insert into storage.buckets
