@@ -81,13 +81,25 @@ export const Combobox = forwardRef(
 					>
 						<span className="line-clamp-1 text-left font-normal">
 							{props.multiple && props.value && props.value.length === 1 && (
-								<span className="mr-2">{props.value}</span>
+								<span className="mr-2">
+									{
+										props.options.find(
+											(option) => option.value === props.value?.[0],
+										)?.label
+									}
+								</span>
 							)}
 
 							{props.multiple && props.value && props.value.length > 1 && (
 								<span className="mr-2">
 									{props.value && props.value.length < 5
-										? props.value.toString()
+										? props.value
+												.map((value) => {
+													return props.options.find(
+														(option) => option.value === value,
+													)?.label
+												})
+												.join(", ")
 										: `${props.value.length} selected`}
 								</span>
 							)}

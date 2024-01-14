@@ -13,31 +13,13 @@ import { AlbumArtwork } from "./_index/components/album"
 import { Combobox } from "~/components/custom/multipleCombobox"
 import { LoaderFunctionArgs } from "@remix-run/node"
 import { supabase } from "~/infra/supabase"
-const frameworks = [
-	{
-		value: "next.js",
-		label: "Next.js",
-	},
-	{
-		value: "sveltekit",
-		label: "SvelteKit",
-	},
-	{
-		value: "nuxt.js",
-		label: "Nuxt.js",
-	},
-	{
-		value: "remix",
-		label: "Remix",
-	},
-	{
-		value: "astro",
-		label: "Astro",
-	},
-]
+import { Label } from "@radix-ui/react-label"
 
 export const loader = async (args: LoaderFunctionArgs) => {
-	const authors = await supabase.from("authors").select("*")
+	const authorsPromise = supabase.from("authors").select("*")
+	const tagsPromise = supabase.from("tags").select("*")
+
+	const [authors, tags] = await Promise.all([authorsPromise, tagsPromise])
 
 	const formattedAuthors =
 		authors.data?.map((author) => ({
@@ -45,21 +27,26 @@ export const loader = async (args: LoaderFunctionArgs) => {
 			label: author.name,
 		})) || []
 
-	const newFrameworks = [...frameworks, { value: "laravel", label: "Laravel" }]
-	return { frameworks: newFrameworks, authors: formattedAuthors }
+	const formattedTags =
+		tags.data?.map((tag) => ({
+			value: tag.id.toString(),
+			label: tag.title,
+		})) || []
+
+	return { authors: formattedAuthors, tags: formattedTags }
 }
 
 export default function New() {
-	const { frameworks, authors } = useLoaderData<typeof loader>()
+	const { authors, tags } = useLoaderData<typeof loader>()
 	const { pathname } = useLocation()
 
 	const [files, setFiles] = useState<File[]>([])
 	const [artists, setArtists] = useState<string[]>([])
+	const [selectedTags, setSelectedTags] = useState<string[]>([])
 	return (
 		<Form method="post" action={pathname}>
 			<InputWithLabel label="Titulo" name="title" />
-			<ComboboxDemo label="Categoria" name="category" items={frameworks} />
-
+			<Label>Authors</Label>
 			<Combobox
 				options={authors}
 				clearable
@@ -75,8 +62,25 @@ export default function New() {
 			))}
 
 			<p className="text-sm text-muted-foreground">
-				Nao encontrou o artista? <Link to="/authors/new">Clique aqui</Link> para
-				adicionar
+				Arthist no found? <Link to="/authors/new">click here!</Link> to add
+			</p>
+			<Label>Tags</Label>
+			<Combobox
+				options={tags}
+				clearable
+				value={selectedTags}
+				multiple
+				onValueChange={(v) => {
+					setSelectedTags(v)
+				}}
+			/>
+
+			{selectedTags.map((tag) => (
+				<input key={tag} type="hidden" name="tags" value={tag} />
+			))}
+
+			<p className="text-sm text-muted-foreground">
+				Tag no found? <Link to="/tags/new">click here!</Link> to add
 			</p>
 
 			<Input
