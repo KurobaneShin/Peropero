@@ -29,6 +29,7 @@ const { parse } = makeForm(
 		authors: z.array(z.string()).or(z.string()),
 		tags: z.array(z.string()).or(z.string()),
 		file: z.array(z.instanceof(Blob)),
+		cover: z.instanceof(Blob),
 	}),
 )
 
@@ -53,11 +54,9 @@ export const loader = async (args: LoaderFunctionArgs) => {
 	return { authors: formattedAuthors, tags: formattedTags }
 }
 
-export const action = async ({ request, params }: ActionFunctionArgs) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
 	try {
 		const { data, errors } = parse(await request.formData())
-		console.log(data)
-
 		if (errors) {
 			console.log(errors)
 			return { errors }
@@ -71,13 +70,22 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 					return res.data?.path
 				})
 		})
+
+		const coverUpload = await superSupabase.storage
+			.from("covers")
+			.upload(
+				`covers-${Math.random().toString(36).substring(7)}.jpg`,
+				data.cover,
+			)
+			.then((res) => res.data?.path)
+
 		const uploadResults = await Promise.all(uploadPromises)
 
 		const { data: newManga, error: mangaError } = await supabase
 			.from("mangas")
 			.insert({
 				title: data.title,
-				cover: `http://127.0.0.1:54321/storage/v1/object/public/pages/${uploadResults[0]}`,
+				cover: `http://127.0.0.1:54321/storage/v1/object/public/covers/${coverUpload}`,
 			})
 			.select()
 
@@ -85,6 +93,14 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 			console.log(mangaError)
 			return { errors: mangaError }
 		}
+
+		const pagesInsert = uploadResults.map((page, idx) =>
+			supabase.from("pages").insert({
+				page: idx + 1,
+				manga: newManga?.[0]?.id,
+				image: `http://127.0.0.1:54321/storage/v1/object/public/pages/${page}`,
+			}),
+		)
 
 		const authorsToInsert = Array.isArray(data.authors)
 			? data.authors
@@ -109,9 +125,13 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 			supabase.from("mangas_tags").insert(tag),
 		)
 
-		await Promise.all([...authorsInsertPromise, ...tagsInsertPromise])
+		await Promise.all([
+			...authorsInsertPromise,
+			...tagsInsertPromise,
+			...pagesInsert,
+		])
 
-		return redirect("/")
+		return redirect(`/mangas/${newManga?.[0]?.id}`)
 	} catch (e) {
 		console.log(e)
 		return e
@@ -123,6 +143,8 @@ export default function New() {
 	const { pathname } = useLocation()
 
 	const [files, setFiles] = useState<File[]>([])
+
+	const [cover, setCover] = useState<File>()
 	const [artists, setArtists] = useState<string[]>([])
 	const [selectedTags, setSelectedTags] = useState<string[]>([])
 	return (
@@ -166,8 +188,31 @@ export default function New() {
 				Tag no found? <Link to="/tags/new">click here!</Link> to add
 			</p>
 
-			<Label>Pages</Label>
+			<Label>Cover</Label>
+			<Input
+				type="file"
+				name="cover"
+				onChange={(e) => {
+					console.log(e.target.files)
+					setCover(e.target.files?.[0])
+				}}
+			/>
 
+			{cover && (
+				<AlbumArtwork
+					aspectRatio="portrait"
+					className="w-[150px]"
+					width={150}
+					height={150}
+					album={{
+						title: cover.name,
+						cover: URL.createObjectURL(cover),
+						artist: "",
+					}}
+				/>
+			)}
+
+			<Label>Pages</Label>
 			<Input
 				type="file"
 				name="file"
@@ -179,7 +224,7 @@ export default function New() {
 				}}
 			/>
 
-			<div className="flex flex-row space-x-4">
+			<div className="flex flex-row space-x-4 flex-wrap">
 				{files.map((file: File) => (
 					<AlbumArtwork
 						key={file.name}
