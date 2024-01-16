@@ -6,6 +6,7 @@ import {
 	Scripts,
 	ScrollRestoration,
 	useLoaderData,
+	useNavigation,
 } from "@remix-run/react"
 import "./globals.css"
 import clsx from "clsx"
@@ -13,6 +14,9 @@ import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from "remix-themes"
 import { themeSessionResolver } from "./cookies"
 import { LoaderFunctionArgs } from "@remix-run/node"
 import { Sidebar } from "./routes/_index/components/sidebar"
+import { useEffect } from "react"
+import nProgress from "nprogress"
+
 export async function loader({ request }: LoaderFunctionArgs) {
 	const { getTheme } = await themeSessionResolver(request)
 	return {
@@ -29,6 +33,19 @@ export default function AppWithProviders() {
 }
 function App() {
 	const data = useLoaderData<typeof loader>()
+
+	const transition = useNavigation()
+
+	// nprogress
+	useEffect(() => {
+		if (transition.state === "loading" || transition.state === "submitting") {
+			nProgress.start()
+		}
+		if (transition.state === "idle") {
+			nProgress.done()
+		}
+	}, [transition.state])
+
 	const [theme] = useTheme()
 	return (
 		<html lang="en" className={clsx(theme)}>

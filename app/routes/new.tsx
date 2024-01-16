@@ -54,6 +54,24 @@ export const loader = async (args: LoaderFunctionArgs) => {
 	return { authors: formattedAuthors, tags: formattedTags }
 }
 
+function handlePageUploads(files: Blob[]) {
+	return files.map(async (file) =>
+		superSupabase.storage
+			.from("pages")
+			.upload(`pages-${Math.random().toString(36).substring(7)}.jpg`, file)
+			.then((res) => {
+				return res.data?.path
+			}),
+	)
+}
+
+async function handleCoverUpload(file: Blob) {
+	return superSupabase.storage
+		.from("covers")
+		.upload(`covers-${Math.random().toString(36).substring(7)}.jpg`, file)
+		.then((res) => res.data?.path)
+}
+
 export const action = async ({ request }: ActionFunctionArgs) => {
 	try {
 		const { data, errors } = parse(await request.formData())
@@ -62,22 +80,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 			return { errors }
 		}
 
-		const uploadPromises = data.file.map(async (file) => {
-			return superSupabase.storage
-				.from("pages")
-				.upload(`pages-${Math.random().toString(36).substring(7)}.jpg`, file)
-				.then((res) => {
-					return res.data?.path
-				})
-		})
+		const uploadPromises = handlePageUploads(data.file)
 
-		const coverUpload = await superSupabase.storage
-			.from("covers")
-			.upload(
-				`covers-${Math.random().toString(36).substring(7)}.jpg`,
-				data.cover,
-			)
-			.then((res) => res.data?.path)
+		const coverUpload = await handleCoverUpload(data.cover)
 
 		const uploadResults = await Promise.all(uploadPromises)
 
