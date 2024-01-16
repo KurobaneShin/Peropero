@@ -8,6 +8,7 @@ import { mangas } from "./data/mangas"
 import { useLoaderData, useNavigate } from "@remix-run/react"
 import { Sidebar } from "./components/sidebar"
 import { supabase } from "~/infra/supabase"
+import { PlusCircleIcon } from "lucide-react"
 
 export const meta: MetaFunction = () => {
 	return [
@@ -42,6 +43,9 @@ export default function Index() {
 									<Tabs defaultValue="manga" className="h-full space-y-6">
 										<div className="space-between flex items-center">
 											<TabsList>
+												<TabsTrigger value="anime" disabled>
+													Animes
+												</TabsTrigger>
 												<TabsTrigger value="manga" className="relative">
 													Mangas
 												</TabsTrigger>
@@ -51,8 +55,8 @@ export default function Index() {
 											</TabsList>
 											<div className="ml-auto mr-4">
 												<Button onClick={() => navigate("new")}>
-													{/*<PlusCircledIcon className="mr-2 h-4 w-4" />*/}
-													Adicionar
+													<PlusCircleIcon className="mr-2 h-4 w-4" />
+													Add
 												</Button>
 											</div>
 										</div>
@@ -95,7 +99,7 @@ export default function Index() {
 											</div>
 											<div className="mt-6 space-y-1">
 												<h2 className="text-2xl font-semibold tracking-tight">
-													Recentemente adicionados
+													Recently Added
 												</h2>
 											</div>
 											<Separator className="my-4" />

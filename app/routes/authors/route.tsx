@@ -23,7 +23,7 @@ export default function Authors() {
 				<h1>Authors</h1>
 				{!pathname.includes("new") && (
 					<div>
-						<Link to="new">Adicionar</Link>
+						<Link to="new">Add</Link>
 					</div>
 				)}
 			</div>

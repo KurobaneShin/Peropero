@@ -9,7 +9,7 @@ interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const routes = [
 	{
-		name: "Início",
+		name: "Home",
 		path: "/",
 		icon: (
 			<svg
@@ -29,12 +29,12 @@ const routes = [
 			</svg>
 		),
 	},
+	// {
+	// 	name: "Descubra",
+	// 	path: "/discover",
+	// },
 	{
-		name: "Descubra",
-		path: "/discover",
-	},
-	{
-		name: "Aleatório",
+		name: "Random",
 		path: "/random",
 	},
 	{
@@ -42,19 +42,15 @@ const routes = [
 		path: "/tags",
 	},
 	{
-		name: "Categorias",
-		path: "/categories",
-	},
-	{
-		name: "Autores",
+		name: "Authors",
 		path: "/authors",
 	},
 	{
-		name: "Grupos",
+		name: "Groups",
 		path: "/groups",
 	},
 	{
-		name: "Parodias",
+		name: "Parodies",
 		path: "/parodies",
 	},
 ]
@@ -70,7 +66,7 @@ export function Sidebar({ className, playlists }: SidebarProps) {
 						Discover
 					</h2>
 					<div className="space-y-1">
-						{routes.slice(0, 3).map((route, i) => (
+						{routes.slice(0, 2).map((route, i) => (
 							<Button
 								key={`${route.name}-${i}`}
 								variant={pathname === route.path ? "secondary" : "ghost"}
@@ -88,7 +84,7 @@ export function Sidebar({ className, playlists }: SidebarProps) {
 						Mangas
 					</h2>
 					<div className="space-y-1">
-						{routes.slice(3).map((route, i) => (
+						{routes.slice(2).map((route, i) => (
 							<Button
 								key={`${route.name}-${i}`}
 								variant={pathname === route.path ? "secondary" : "ghost"}
@@ -103,7 +99,7 @@ export function Sidebar({ className, playlists }: SidebarProps) {
 				</div>
 				<div className="py-2">
 					<h2 className="relative px-7 text-lg font-semibold tracking-tight">
-						Favoritos
+						Favorites
 					</h2>
 					<ScrollArea className="h-[300px] px-1">
 						<div className="space-y-1 p-2">
