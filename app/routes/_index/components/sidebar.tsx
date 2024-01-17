@@ -29,10 +29,6 @@ const routes = [
 			</svg>
 		),
 	},
-	// {
-	// 	name: "Descubra",
-	// 	path: "/discover",
-	// },
 	{
 		name: "Random",
 		path: "/random",
@@ -52,6 +48,14 @@ const routes = [
 	{
 		name: "Parodies",
 		path: "/parodies",
+	},
+	{
+		name: "Characters",
+		path: "/characters",
+	},
+	{
+		name: "Languages",
+		path: "/languages",
 	},
 ]
 

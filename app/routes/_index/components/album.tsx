@@ -16,6 +16,7 @@ interface AlbumArtworkProps extends React.HTMLAttributes<HTMLDivElement> {
 	aspectRatio?: "portrait" | "square"
 	width?: number
 	height?: number
+	hasContextMenu?: boolean
 }
 
 export function AlbumArtwork({
@@ -24,8 +25,28 @@ export function AlbumArtwork({
 	width,
 	height,
 	className,
+	hasContextMenu = true,
 	...props
 }: AlbumArtworkProps) {
+	if (!hasContextMenu) {
+		return (
+			<div className={cn("space-y-3", className)} {...props}>
+				<div className="overflow-hidden rounded-md">
+					<img
+						src={album.cover}
+						alt={album.title}
+						width={width}
+						height={height}
+						className={cn(
+							"h-auto w-auto object-cover transition-all hover:scale-105",
+							aspectRatio === "portrait" ? "aspect-[3/4]" : "aspect-square",
+						)}
+					/>
+				</div>
+			</div>
+		)
+	}
+
 	return (
 		<div className={cn("space-y-3", className)} {...props}>
 			<ContextMenu>

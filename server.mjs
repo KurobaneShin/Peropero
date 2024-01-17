@@ -1,5 +1,5 @@
 import { createRequestHandler } from "@remix-run/express";
-import { installGlobals } from "@remix-run/node";
+import { installGlobals } from "@remix-run/server-node";
 import express from "express";
 
 installGlobals();
