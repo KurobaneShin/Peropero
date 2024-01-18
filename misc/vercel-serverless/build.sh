@@ -9,7 +9,7 @@ set -eu -o pipefail
 #     functions/
 #       index.func/
 #         .vc-config.json
-#         index.js         = app/adapters/vercel-edge.ts
+#         index.mjs         = app/adapters/vercel-serverless.ts
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
@@ -28,8 +28,11 @@ rm -rf .vercel/output/static/.vite
 # functions
 mkdir -p .vercel/output/functions/index.func
 cp .vc-config.json .vercel/output/functions/index.func/.vc-config.json
-npx esbuild ../../app/adapters/vercel-edge.ts \
-  --outfile=.vercel/output/functions/index.func/index.js \
-  --metafile=build/esbuild-metafile-vercel-edge.json \
-  --bundle --minify --format=esm --platform=browser
+
+npx esbuild ../../server.mjs \
+  --outfile=.vercel/output/functions/index.func/index.mjs \
+  --metafile=../../build/esbuild-metafile-vercel-serverless.json \
+  --define:process.env.NODE_ENV='"production"' \
+  --banner:js="import { createRequire } from 'module'; const require = createRequire(import.meta.url);" \
+  --bundle --minify --format=esm --platform=node
 

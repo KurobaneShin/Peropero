@@ -15,7 +15,7 @@ import {
   ActionFunctionArgs,
   LoaderFunctionArgs,
   redirect,
-} from "@remix-run/server-node";
+} from "@remix-run/node";
 import { supabase, superSupabase } from "~/infra/supabase";
 import { Label } from "@radix-ui/react-label";
 import { Button } from "~/components/ui/button";

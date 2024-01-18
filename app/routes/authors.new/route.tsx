@@ -1,4 +1,4 @@
-import { ActionFunctionArgs, redirect } from "@remix-run/server-node";
+import { ActionFunctionArgs, redirect } from "@remix-run/node";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import { z } from "zod";
 import { FormControl } from "~/components/custom/FormControl";
