@@ -52,16 +52,18 @@ export function AlbumArtwork({
 			<ContextMenu>
 				<ContextMenuTrigger>
 					<div className="overflow-hidden rounded-md">
-						<img
-							src={album.cover}
-							alt={album.title}
-							width={width}
-							height={height}
-							className={cn(
-								"h-auto w-auto object-cover transition-all hover:scale-105",
-								aspectRatio === "portrait" ? "aspect-[3/4]" : "aspect-square",
-							)}
-						/>
+						<Link to={`/mangas/${album.id}`} prefetch="intent">
+							<img
+								src={album.cover}
+								alt={album.title}
+								width={width}
+								height={height}
+								className={cn(
+									"h-auto w-auto object-cover transition-all hover:scale-105",
+									aspectRatio === "portrait" ? "aspect-[3/4]" : "aspect-square",
+								)}
+							/>
+						</Link>
 					</div>
 				</ContextMenuTrigger>
 				<ContextMenuContent className="w-40 bg-background">

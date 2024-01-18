@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "@remix-run/react"
+import { Link, useLocation, useNavigate } from "@remix-run/react"
 import { Button } from "~/components/ui/button"
 import { ScrollArea } from "~/components/ui/scroll-area"
 import { cn } from "~/lib/utils"
@@ -71,15 +71,17 @@ export function Sidebar({ className, playlists }: SidebarProps) {
 					</h2>
 					<div className="space-y-1">
 						{routes.slice(0, 2).map((route, i) => (
-							<Button
-								key={`${route.name}-${i}`}
-								variant={pathname === route.path ? "secondary" : "ghost"}
-								onClick={() => navigate(route.path)}
-								className={cn("w-full justify-start")}
-							>
-								{route.icon}
-								{route.name}
-							</Button>
+							<Link to={route.path} prefetch="intent">
+								<Button
+									key={`${route.name}-${i}`}
+									variant={pathname === route.path ? "secondary" : "ghost"}
+									onClick={() => navigate(route.path)}
+									className={cn("w-full justify-start")}
+								>
+									{route.icon}
+									{route.name}
+								</Button>
+							</Link>
 						))}
 					</div>
 				</div>
@@ -89,15 +91,17 @@ export function Sidebar({ className, playlists }: SidebarProps) {
 					</h2>
 					<div className="space-y-1">
 						{routes.slice(2).map((route, i) => (
-							<Button
-								key={`${route.name}-${i}`}
-								variant={pathname === route.path ? "secondary" : "ghost"}
-								onClick={() => navigate(route.path)}
-								className={cn("w-full justify-start")}
-							>
-								{route.icon}
-								{route.name}
-							</Button>
+							<Link to={route.path} prefetch="intent">
+								<Button
+									key={`${route.name}-${i}`}
+									variant={pathname === route.path ? "secondary" : "ghost"}
+									onClick={() => navigate(route.path)}
+									className={cn("w-full justify-start")}
+								>
+									{route.icon}
+									{route.name}
+								</Button>
+							</Link>
 						))}
 					</div>
 				</div>
