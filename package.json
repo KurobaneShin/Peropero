@@ -14,7 +14,7 @@
 		"release-vercel-edge": "vercel deploy --prebuilt misc/vercel-edge --prod",
 		"build-vercel-serverless": "bash misc/vercel-serverless/build.sh",
 		"release-vercel-serverless-staging": "vercel deploy --prebuilt misc/vercel-serverless",
-		"release-vercel-serverless": "vercel deploy --prebuilt misc/vercel-serverless --prod",
+		"release-vercel-serverless": "vercel -e .env deploy --prebuilt misc/vercel-serverless --prod",
 		"supabase:start": "supabase start",
 		"gentypes": "supabase gen types typescript --db-url postgresql://postgres:postgres@127.0.0.1:54322/postgres > database.types.ts"
 	},
