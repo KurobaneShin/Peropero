@@ -71,9 +71,12 @@ export function Sidebar({ className, playlists }: SidebarProps) {
 					</h2>
 					<div className="space-y-1">
 						{routes.slice(0, 2).map((route, i) => (
-							<Link to={route.path} prefetch="intent">
+							<Link
+								to={route.path}
+								prefetch="intent"
+								key={`${route.name}-${i}`}
+							>
 								<Button
-									key={`${route.name}-${i}`}
 									variant={pathname === route.path ? "secondary" : "ghost"}
 									onClick={() => navigate(route.path)}
 									className={cn("w-full justify-start")}
@@ -91,9 +94,12 @@ export function Sidebar({ className, playlists }: SidebarProps) {
 					</h2>
 					<div className="space-y-1">
 						{routes.slice(2).map((route, i) => (
-							<Link to={route.path} prefetch="intent">
+							<Link
+								to={route.path}
+								prefetch="intent"
+								key={`${route.name}-${i}`}
+							>
 								<Button
-									key={`${route.name}-${i}`}
 									variant={pathname === route.path ? "secondary" : "ghost"}
 									onClick={() => navigate(route.path)}
 									className={cn("w-full justify-start")}

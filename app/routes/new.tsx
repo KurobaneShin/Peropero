@@ -1,4 +1,5 @@
 import {
+	ClientActionFunctionArgs,
 	Form,
 	Link,
 	Outlet,
@@ -141,6 +142,14 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 		console.log(e)
 		return e
 	}
+}
+
+export const clientAction = async ({
+	serverAction,
+}: ClientActionFunctionArgs) => {
+	sessionStorage.removeItem("/root")
+	const data = await serverAction()
+	return data
 }
 
 export default function New() {
