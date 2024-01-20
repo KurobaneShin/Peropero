@@ -6,14 +6,12 @@ import { Button } from "~/components/ui/button"
 import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs"
 import { AlbumArtwork } from "./components/album"
-import { mangas } from "./data/mangas"
 import {
 	Await,
 	ClientLoaderFunctionArgs,
 	useLoaderData,
 	useNavigate,
 } from "@remix-run/react"
-import { Sidebar } from "./components/sidebar"
 import { supabase } from "~/infra/supabase"
 import { PlusCircleIcon } from "lucide-react"
 import { Suspense } from "react"
@@ -52,6 +50,7 @@ export const loader = async () => {
 		}
 		return data
 	}
+
 	return defer({ mangas: getMangas(), newestMangas: getNewestMangas() })
 }
 

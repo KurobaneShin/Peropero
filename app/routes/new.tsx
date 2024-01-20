@@ -1,4 +1,5 @@
 import {
+	Await,
 	ClientActionFunctionArgs,
 	Form,
 	Link,
@@ -6,7 +7,7 @@ import {
 	useLoaderData,
 	useLocation,
 } from "@remix-run/react"
-import { useState } from "react"
+import { Suspense, useState } from "react"
 import { ComboboxDemo } from "~/components/custom/combobox"
 import { InputWithLabel } from "~/components/custom/inputWithLabel"
 import { Input } from "~/components/ui/input"
@@ -14,6 +15,7 @@ import { AlbumArtwork } from "./_index/components/album"
 import { Combobox } from "~/components/custom/multipleCombobox"
 import {
 	ActionFunctionArgs,
+	defer,
 	LoaderFunctionArgs,
 	redirect,
 } from "@remix-run/node"
@@ -36,24 +38,28 @@ const { parse } = makeForm(
 )
 
 export const loader = async (args: LoaderFunctionArgs) => {
-	const authorsPromise = supabase.from("authors").select("*")
-	const tagsPromise = supabase.from("tags").select("*")
+	const authorsPromise = async () => {
+		const data = await supabase.from("authors").select("*")
 
-	const [authors, tags] = await Promise.all([authorsPromise, tagsPromise])
+		return (
+			data.data?.map((author) => ({
+				value: author.id.toString(),
+				label: author.name,
+			})) || []
+		)
+	}
+	const tagsPromise = async () => {
+		const data = await supabase.from("tags").select("*")
 
-	const formattedAuthors =
-		authors.data?.map((author) => ({
-			value: author.id.toString(),
-			label: author.name,
-		})) || []
+		return (
+			data.data?.map((tag) => ({
+				value: tag.id.toString(),
+				label: tag.title,
+			})) || []
+		)
+	}
 
-	const formattedTags =
-		tags.data?.map((tag) => ({
-			value: tag.id.toString(),
-			label: tag.title,
-		})) || []
-
-	return { authors: formattedAuthors, tags: formattedTags }
+	return defer({ authors: authorsPromise(), tags: tagsPromise() })
 }
 
 function handlePageUploads(files: Blob[]) {
@@ -168,15 +174,22 @@ export default function New() {
 			<InputWithLabel label="Titulo" name="title" />
 
 			<Label>Authors</Label>
-			<Combobox
-				options={authors}
-				clearable
-				value={artists}
-				multiple
-				onValueChange={(v) => {
-					setArtists(v)
-				}}
-			/>
+
+			<Suspense fallback={<div>Loading...</div>}>
+				<Await resolve={authors}>
+					{(authorsList) => (
+						<Combobox
+							options={authorsList}
+							clearable
+							value={artists}
+							multiple
+							onValueChange={(v) => {
+								setArtists(v)
+							}}
+						/>
+					)}
+				</Await>
+			</Suspense>
 
 			{artists.map((artist) => (
 				<input key={artist} type="hidden" name="authors" value={artist} />
@@ -186,15 +199,22 @@ export default function New() {
 				Arthist no found? <Link to="/authors/new">click here!</Link> to add
 			</p>
 			<Label>Tags</Label>
-			<Combobox
-				options={tags}
-				clearable
-				value={selectedTags}
-				multiple
-				onValueChange={(v) => {
-					setSelectedTags(v)
-				}}
-			/>
+
+			<Suspense fallback={<div>Loading...</div>}>
+				<Await resolve={tags}>
+					{(tagsList) => (
+						<Combobox
+							options={tagsList}
+							clearable
+							value={selectedTags}
+							multiple
+							onValueChange={(v) => {
+								setSelectedTags(v)
+							}}
+						/>
+					)}
+				</Await>
+			</Suspense>
 
 			{selectedTags.map((tag) => (
 				<input key={tag} type="hidden" name="tags" value={tag} />
