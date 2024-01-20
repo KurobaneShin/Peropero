@@ -1,9 +1,9 @@
 import {
 	Await,
 	ClientActionFunctionArgs,
+	ClientLoaderFunctionArgs,
 	Form,
 	Link,
-	Outlet,
 	useLoaderData,
 	useLocation,
 } from "@remix-run/react"
@@ -61,6 +61,23 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
 	return defer({ authors: authorsPromise(), tags: tagsPromise() })
 }
+
+export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
+	const cacheKey = "/new"
+	const cache = sessionStorage.getItem(cacheKey)
+
+	if (cache) return JSON.parse(cache)
+
+	const loaderData = await serverLoader<typeof loader>()
+
+	const tags = await loaderData.tags
+	const authors = await loaderData.authors
+
+	sessionStorage.setItem(cacheKey, JSON.stringify({ tags, authors }))
+	return { tags, authors }
+}
+
+clientLoader.hydrate = true
 
 function handlePageUploads(files: Blob[]) {
 	return files.map(async (file) =>
