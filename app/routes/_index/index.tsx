@@ -9,6 +9,7 @@ import { AlbumArtwork } from "./components/album"
 import {
 	Await,
 	ClientLoaderFunctionArgs,
+	Link,
 	useLoaderData,
 	useNavigate,
 } from "@remix-run/react"
@@ -73,7 +74,6 @@ clientLoader.hydrate = true
 
 export default function Index() {
 	const { mangas, newestMangas } = useLoaderData<typeof loader>()
-	const navigate = useNavigate()
 	return (
 		<>
 			<div className="hidden md:block">
@@ -96,10 +96,12 @@ export default function Index() {
 												</TabsTrigger>
 											</TabsList>
 											<div className="ml-auto mr-4">
-												<Button onClick={() => navigate("new")}>
-													<PlusCircleIcon className="mr-2 h-4 w-4" />
-													Add
-												</Button>
+												<Link to="/new">
+													<Button>
+														<PlusCircleIcon className="mr-2 h-4 w-4" />
+														Add
+													</Button>
+												</Link>
 											</div>
 										</div>
 										<TabsContent
