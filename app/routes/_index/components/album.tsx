@@ -10,6 +10,7 @@ import {
 import { Manga, mangas } from "../data/mangas"
 import { cn } from "~/lib/utils"
 import { Link } from "@remix-run/react"
+import { MangaLink } from "~/components/custom/MangaLink"
 
 interface AlbumArtworkProps extends React.HTMLAttributes<HTMLDivElement> {
 	album: Manga
@@ -17,6 +18,10 @@ interface AlbumArtworkProps extends React.HTMLAttributes<HTMLDivElement> {
 	width?: number
 	height?: number
 	hasContextMenu?: boolean
+	pages?: {
+		id: string
+		image: string
+	}[]
 }
 
 export function AlbumArtwork({
@@ -26,6 +31,7 @@ export function AlbumArtwork({
 	height,
 	className,
 	hasContextMenu = true,
+	pages,
 	...props
 }: AlbumArtworkProps) {
 	if (!hasContextMenu) {
@@ -52,7 +58,12 @@ export function AlbumArtwork({
 			<ContextMenu>
 				<ContextMenuTrigger>
 					<div className="overflow-hidden rounded-md">
-						<Link to={`/mangas/${album.id}`} prefetch="intent">
+						<MangaLink
+							id={album.id?.toString() as string}
+							title={album.title}
+							cover={album.cover}
+							pages={pages}
+						>
 							<img
 								src={album.cover}
 								alt={album.title}
@@ -63,7 +74,7 @@ export function AlbumArtwork({
 									aspectRatio === "portrait" ? "aspect-[3/4]" : "aspect-square",
 								)}
 							/>
-						</Link>
+						</MangaLink>
 					</div>
 				</ContextMenuTrigger>
 				<ContextMenuContent className="w-40 bg-background">

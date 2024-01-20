@@ -29,7 +29,7 @@ export const loader = async () => {
 	const getMangas = async () => {
 		const { data, error } = await supabase
 			.from("mangas")
-			.select("*,mangas_authors(authors(*))")
+			.select("*,pages(*),mangas_authors(authors(*))")
 
 		if (error) {
 			console.log(error)
@@ -40,7 +40,7 @@ export const loader = async () => {
 	const getNewestMangas = async () => {
 		const { data, error } = await supabase
 			.from("mangas")
-			.select("*,mangas_authors(authors(*))")
+			.select("*,pages(*),mangas_authors(authors(*))")
 			.order("created_at", {
 				ascending: false,
 			})
@@ -74,7 +74,6 @@ clientLoader.hydrate = true
 
 export default function Index() {
 	const { mangas, newestMangas } = useLoaderData<typeof loader>()
-	console.log(newestMangas)
 	const navigate = useNavigate()
 	return (
 		<>
@@ -128,6 +127,7 @@ export default function Index() {
 																	{mangasList.map((album) => (
 																		<AlbumArtwork
 																			key={album.title}
+																			pages={album.pages}
 																			album={{
 																				title: album.title,
 																				id: album.id.toString(),
@@ -172,6 +172,7 @@ export default function Index() {
 																					album.mangas_authors?.[0]?.authors
 																						?.name || "",
 																			}}
+																			pages={album.pages}
 																			className="w-[250px]"
 																			aspectRatio="square"
 																			width={250}

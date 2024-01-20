@@ -109,12 +109,14 @@ export default function MangaId() {
 							</CardHeader>
 							<div className="grid gap-2 md:grid-cols-5">
 								{manga.pages.map((page) => (
-									<div className="flex flex-col gap-4 items-center">
+									<div
+										key={page.id}
+										className="flex flex-col gap-4 items-center"
+									>
 										<img
 											alt="Manga Page"
 											className="aspect-[2/3] h-96  object-cover border border-gray-200 w-64 rounded-lg overflow-hidden dark:border-gray-800"
 											height={125}
-											key={page.id}
 											src={page.image}
 											width={75}
 										/>
