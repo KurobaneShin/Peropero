@@ -23,6 +23,7 @@ import { Button } from "~/components/ui/button"
 import { makeForm } from "~/lib/makeForm"
 import { z } from "zod"
 import { zfd } from "zod-form-data"
+import { useObjectUrls } from "~/hooks/useOjectUrls"
 
 const { parse } = makeForm(
 	z.object({
@@ -161,6 +162,7 @@ export default function New() {
 	const [cover, setCover] = useState<File>()
 	const [artists, setArtists] = useState<string[]>([])
 	const [selectedTags, setSelectedTags] = useState<string[]>([])
+	const getObjectUrl = useObjectUrls()
 	return (
 		<Form method="post" action={pathname} encType="multipart/form-data">
 			<InputWithLabel label="Titulo" name="title" />
@@ -207,7 +209,6 @@ export default function New() {
 				type="file"
 				name="cover"
 				onChange={(e) => {
-					console.log(e.target.files)
 					setCover(e.target.files?.[0])
 				}}
 			/>
@@ -221,7 +222,7 @@ export default function New() {
 					height={150}
 					album={{
 						title: cover.name,
-						cover: URL.createObjectURL(cover),
+						cover: getObjectUrl(cover),
 						artist: "",
 					}}
 				/>
@@ -233,7 +234,6 @@ export default function New() {
 				name="file"
 				multiple
 				onChange={(e) => {
-					console.log(e.target.files)
 					const files = Array.from(e.target.files || [])
 					setFiles(files)
 				}}
@@ -250,7 +250,7 @@ export default function New() {
 						height={150}
 						album={{
 							title: file.name,
-							cover: URL.createObjectURL(file),
+							cover: getObjectUrl(file),
 							artist: "",
 						}}
 					/>
