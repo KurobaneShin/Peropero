@@ -1,13 +1,7 @@
 import { ActionFunctionArgs, redirect } from "@remix-run/node"
-import {
-	ClientActionFunctionArgs,
-	Form,
-	useActionData,
-	useLoaderData,
-} from "@remix-run/react"
+import { ClientActionFunctionArgs, Form } from "@remix-run/react"
 import { z } from "zod"
 import { FormControl } from "~/components/custom/FormControl"
-import { InputWithLabel } from "~/components/custom/inputWithLabel"
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
 import { supabase } from "~/infra/supabase"
@@ -23,7 +17,9 @@ export const action = async (args: ActionFunctionArgs) => {
 	const formData = await args.request.formData()
 	const { data, errors } = parse(formData)
 
-	if (errors) return { errors }
+	if (errors) {
+		return { errors }
+	}
 
 	const { name } = data
 
@@ -42,13 +38,10 @@ export const clientAction = async ({
 }
 
 export default function New() {
-	const data = useActionData<typeof action>()
-	console.log(data)
-
 	return (
 		<Form method="post">
 			<FormControl name="name" label="Nome">
-				<Input name="name" autoFocus />
+				<Input name="name" autoFocus={true} />
 			</FormControl>
 			<Button type="submit">Enviar</Button>
 		</Form>

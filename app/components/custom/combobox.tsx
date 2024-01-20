@@ -1,5 +1,5 @@
-import * as React from "react"
 import { Check, ChevronsUpDown } from "lucide-react"
+import * as React from "react"
 
 import { cn } from "~/lib/utils"
 import { Button } from "../ui/button"
@@ -10,8 +10,8 @@ import {
 	CommandInput,
 	CommandItem,
 } from "../ui/command"
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
 import { Label } from "../ui/label"
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
 
 type Props = {
 	items: { value: string; label: string }[]
@@ -27,7 +27,7 @@ export function ComboboxDemo({ items, name, label }: Props) {
 		<>
 			<Label htmlFor={name}>{label}</Label>
 			<Popover open={open} onOpenChange={setOpen}>
-				<PopoverTrigger asChild>
+				<PopoverTrigger asChild={true}>
 					<Button
 						id={name}
 						variant="outline"

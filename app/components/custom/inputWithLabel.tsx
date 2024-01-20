@@ -1,7 +1,7 @@
-import { Input } from "../ui/input"
 import type { HTMLInputTypeAttribute } from "react"
-import { Label } from "../ui/label"
 import { useFormErrors } from "~/hooks/useFormErros"
+import { Input } from "../ui/input"
+import { Label } from "../ui/label"
 
 type InputWithLabelProps = {
 	name: string

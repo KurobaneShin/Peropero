@@ -1,3 +1,10 @@
+import { Label } from "@radix-ui/react-label"
+import {
+	ActionFunctionArgs,
+	LoaderFunctionArgs,
+	defer,
+	redirect,
+} from "@remix-run/node"
 import {
 	Await,
 	ClientActionFunctionArgs,
@@ -8,24 +15,16 @@ import {
 	useLocation,
 } from "@remix-run/react"
 import { Suspense, useState } from "react"
-import { ComboboxDemo } from "~/components/custom/combobox"
-import { InputWithLabel } from "~/components/custom/inputWithLabel"
-import { Input } from "~/components/ui/input"
-import { AlbumArtwork } from "./_index/components/album"
-import { Combobox } from "~/components/custom/multipleCombobox"
-import {
-	ActionFunctionArgs,
-	defer,
-	LoaderFunctionArgs,
-	redirect,
-} from "@remix-run/node"
-import { supabase, superSupabase } from "~/infra/supabase"
-import { Label } from "@radix-ui/react-label"
-import { Button } from "~/components/ui/button"
-import { makeForm } from "~/lib/makeForm"
 import { z } from "zod"
 import { zfd } from "zod-form-data"
+import { InputWithLabel } from "~/components/custom/inputWithLabel"
+import { Combobox } from "~/components/custom/multipleCombobox"
+import { Button } from "~/components/ui/button"
+import { Input } from "~/components/ui/input"
 import { useObjectUrls } from "~/hooks/useOjectUrls"
+import { supabase, superSupabase } from "~/infra/supabase"
+import { makeForm } from "~/lib/makeForm"
+import { AlbumArtwork } from "./_index/components/album"
 
 const { parse } = makeForm(
 	z.object({
@@ -197,9 +196,9 @@ export default function New() {
 					{(authorsList) => (
 						<Combobox
 							options={authorsList}
-							clearable
+							clearable={true}
 							value={artists}
-							multiple
+							multiple={true}
 							onValueChange={(v) => {
 								setArtists(v)
 							}}
@@ -222,9 +221,9 @@ export default function New() {
 					{(tagsList) => (
 						<Combobox
 							options={tagsList}
-							clearable
+							clearable={true}
 							value={selectedTags}
-							multiple
+							multiple={true}
 							onValueChange={(v) => {
 								setSelectedTags(v)
 							}}
@@ -269,7 +268,7 @@ export default function New() {
 			<Input
 				type="file"
 				name="file"
-				multiple
+				multiple={true}
 				onChange={(e) => {
 					const files = Array.from(e.target.files || [])
 					setFiles(files)

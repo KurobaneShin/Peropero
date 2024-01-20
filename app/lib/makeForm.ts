@@ -1,7 +1,7 @@
-import { zfd } from "zod-form-data"
-import { z } from "zod"
 import { useActionData } from "@remix-run/react"
 import { useState } from "react"
+import { z } from "zod"
+import { zfd } from "zod-form-data"
 
 export function makeForm<T extends z.ZodTypeAny>(schema: T) {
 	const parserFn = (f: FormData) => zfd.formData(schema).safeParse(f)

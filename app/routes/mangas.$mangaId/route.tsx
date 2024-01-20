@@ -1,9 +1,9 @@
 import { LoaderFunctionArgs } from "@remix-run/node"
 import { ClientLoaderFunctionArgs, useLoaderData } from "@remix-run/react"
-import { getMangaDetails } from "~/repositories/mangas"
-import { Card, CardContent, CardHeader } from "~/components/ui/card"
-import { Button } from "~/components/ui/button"
 import { Badge } from "~/components/ui/badge"
+import { Button } from "~/components/ui/button"
+import { Card, CardContent, CardHeader } from "~/components/ui/card"
+import { getMangaDetails } from "~/repositories/mangas"
 
 export const loader = async (args: LoaderFunctionArgs) => {
 	const { mangaId } = args.params

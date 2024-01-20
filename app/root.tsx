@@ -1,3 +1,4 @@
+import { LoaderFunctionArgs } from "@remix-run/node"
 import {
 	Links,
 	LiveReload,
@@ -8,14 +9,13 @@ import {
 	useLoaderData,
 	useNavigation,
 } from "@remix-run/react"
-import "./globals.css"
 import clsx from "clsx"
+import nProgress from "nprogress"
+import { useEffect } from "react"
 import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from "remix-themes"
 import { themeSessionResolver } from "./cookies"
-import { LoaderFunctionArgs } from "@remix-run/node"
+import "./globals.css"
 import { Sidebar } from "./routes/_index/components/sidebar"
-import { useEffect } from "react"
-import nProgress from "nprogress"
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const { getTheme } = await themeSessionResolver(request)

@@ -2,20 +2,19 @@ import { Separator } from "@radix-ui/react-separator"
 import type { MetaFunction } from "@remix-run/node"
 
 import { defer } from "@remix-run/node"
-import { Button } from "~/components/ui/button"
-import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs"
-import { AlbumArtwork } from "./components/album"
 import {
 	Await,
 	ClientLoaderFunctionArgs,
 	Link,
 	useLoaderData,
-	useNavigate,
 } from "@remix-run/react"
-import { supabase } from "~/infra/supabase"
 import { PlusCircleIcon } from "lucide-react"
 import { Suspense } from "react"
+import { Button } from "~/components/ui/button"
+import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs"
+import { supabase } from "~/infra/supabase"
+import { AlbumArtwork } from "./components/album"
 
 export const meta: MetaFunction = () => {
 	return [
@@ -24,6 +23,7 @@ export const meta: MetaFunction = () => {
 	]
 }
 
+// biome-ignore lint/nursery/useAwait: <explanation>
 export const loader = async () => {
 	const getMangas = async () => {
 		const { data, error } = await supabase
@@ -31,7 +31,6 @@ export const loader = async () => {
 			.select("*,pages(*),mangas_authors(authors(*))")
 
 		if (error) {
-			console.log(error)
 			throw error
 		}
 		return data
@@ -46,7 +45,6 @@ export const loader = async () => {
 			.limit(20)
 
 		if (error) {
-			console.log(error)
 			throw error
 		}
 		return data
@@ -59,7 +57,9 @@ export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
 	const cacheKey = "/root"
 	const cache = sessionStorage.getItem(cacheKey)
 
-	if (cache) return JSON.parse(cache)
+	if (cache) {
+		return JSON.parse(cache)
+	}
 
 	const loaderData = await serverLoader<typeof loader>()
 
@@ -88,10 +88,10 @@ export default function Index() {
 												<TabsTrigger value="mangas" className="relative">
 													Mangas
 												</TabsTrigger>
-												<TabsTrigger value="animes" disabled>
+												<TabsTrigger value="animes" disabled={true}>
 													Animes
 												</TabsTrigger>
-												<TabsTrigger value="games" disabled>
+												<TabsTrigger value="games" disabled={true}>
 													Games
 												</TabsTrigger>
 											</TabsList>
@@ -106,8 +106,7 @@ export default function Index() {
 										</div>
 										<TabsContent
 											value="mangas"
-											className="border-none p-0 outline-none"
-										>
+											className="border-none p-0 outline-none">
 											<div className="flex items-center justify-between">
 												<div className="space-y-1">
 													<h2 className="text-2xl font-semibold tracking-tight">
@@ -187,25 +186,6 @@ export default function Index() {
 													)}
 												</Await>
 											</Suspense>
-										</TabsContent>
-										<TabsContent
-											value="anime"
-											className="h-full flex-col border-none p-0 data-[state=active]:flex"
-										>
-											<div className="flex items-center justify-between">
-												<div className="space-y-1">
-													<h2 className="text-2xl font-semibold tracking-tight">
-														New Episodes
-													</h2>
-													<p className="text-sm text-muted-foreground">
-														Your favorite podcasts. Updated daily.
-													</p>
-												</div>
-											</div>
-											<Separator className="my-4" />
-											{/*
-											<PodcastEmptyPlaceholder />
-                      */}
 										</TabsContent>
 									</Tabs>
 								</div>

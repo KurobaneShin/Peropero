@@ -2,15 +2,15 @@ import {
 	ContextMenuContent,
 	ContextMenuTrigger,
 } from "@radix-ui/react-context-menu"
+import { Link } from "@remix-run/react"
+import { MangaLink } from "~/components/custom/MangaLink"
 import {
 	ContextMenu,
 	ContextMenuItem,
 	ContextMenuSeparator,
 } from "~/components/ui/context-menu"
-import { Manga, mangas } from "../data/mangas"
 import { cn } from "~/lib/utils"
-import { Link } from "@remix-run/react"
-import { MangaLink } from "~/components/custom/MangaLink"
+import { Manga } from "../data/mangas"
 
 interface AlbumArtworkProps extends React.HTMLAttributes<HTMLDivElement> {
 	album: Manga

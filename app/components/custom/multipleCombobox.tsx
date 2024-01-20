@@ -1,6 +1,8 @@
 // Other Imports Removed for Brevity
 
 import { Check, ChevronDown } from "lucide-react"
+import { forwardRef, useState } from "react"
+import { cn } from "~/lib/utils"
 import { Button } from "../ui/button"
 import {
 	Command,
@@ -11,8 +13,6 @@ import {
 } from "../ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
 import { ScrollArea } from "../ui/scroll-area"
-import { cn } from "~/lib/utils"
-import { forwardRef, useState } from "react"
 
 export interface ComboboxOption {
 	value: string
@@ -72,7 +72,7 @@ export const Combobox = forwardRef(
 
 		return (
 			<Popover open={open} onOpenChange={setOpen}>
-				<PopoverTrigger asChild>
+				<PopoverTrigger asChild={true}>
 					<Button
 						role="combobox"
 						variant="outline"

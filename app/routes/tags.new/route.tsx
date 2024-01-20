@@ -1,10 +1,5 @@
 import { ActionFunctionArgs, redirect } from "@remix-run/node"
-import {
-	ClientActionFunctionArgs,
-	Form,
-	useActionData,
-	useLoaderData,
-} from "@remix-run/react"
+import { ClientActionFunctionArgs, Form } from "@remix-run/react"
 import { z } from "zod"
 import { InputWithLabel } from "~/components/custom/inputWithLabel"
 import { Button } from "~/components/ui/button"
@@ -40,12 +35,9 @@ export const clientAction = async ({
 }
 
 export default function New() {
-	const data = useActionData<typeof action>()
-	console.log(data)
-
 	return (
 		<Form method="post">
-			<InputWithLabel autoFocus label="Title" name="title" />
+			<InputWithLabel autoFocus={true} label="Title" name="title" />
 			<Button type="submit">Enviar</Button>
 		</Form>
 	)
