@@ -53,3 +53,15 @@ create table favorites (
   manga integer not null references mangas(id),
   profile uuid not null references profiles(id)
 );
+
+create policy "upload_pages"
+on storage.objects for insert to authenticated with check (
+    -- restrict bucket
+    bucket_id = 'pages'
+);
+
+create policy "upload_covers"
+on storage.objects for insert to authenticated with check (
+    -- restrict bucket
+    bucket_id = 'covers'
+);

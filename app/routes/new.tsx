@@ -1,8 +1,8 @@
 import { Label } from "@radix-ui/react-label"
 import {
 	ActionFunctionArgs,
-	LoaderFunctionArgs,
 	defer,
+	LoaderFunctionArgs,
 	redirect,
 } from "@remix-run/node"
 import {
@@ -80,20 +80,24 @@ clientLoader.hydrate = true
 
 function handlePageUploads(files: Blob[]) {
 	return files.map(async (file) =>
-		superSupabase.storage
+		supabase.storage
 			.from("pages")
 			.upload(`pages-${Math.random().toString(36).substring(7)}.jpg`, file)
 			.then((res) => {
+				console.log(res)
+				if (res.error) throw res.error
 				return res.data?.path
-			}),
+			})
+			.catch((e) => console.log(e)),
 	)
 }
 
 async function handleCoverUpload(file: Blob) {
-	return superSupabase.storage
+	return supabase.storage
 		.from("covers")
 		.upload(`covers-${Math.random().toString(36).substring(7)}.jpg`, file)
 		.then((res) => res.data?.path)
+		.catch((e) => console.log(e))
 }
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -104,11 +108,17 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 			return { errors }
 		}
 
+		console.log("aqui")
+
 		const uploadPromises = handlePageUploads(data.file)
 
 		const coverUpload = await handleCoverUpload(data.cover)
 
+		console.log(coverUpload)
+
 		const uploadResults = await Promise.all(uploadPromises)
+
+		console.log(uploadResults)
 
 		const { data: newManga, error: mangaError } = await supabase
 			.from("mangas")
