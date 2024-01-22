@@ -25,6 +25,7 @@ import { useObjectUrls } from "~/hooks/useOjectUrls"
 import { supabase, superSupabase } from "~/infra/supabase"
 import { makeForm } from "~/lib/makeForm"
 import { AlbumArtwork } from "./_index/components/album"
+import { getUser } from "~/lib/getUser"
 
 const { parse } = makeForm(
 	z.object({
@@ -37,6 +38,7 @@ const { parse } = makeForm(
 )
 
 export const loader = async (args: LoaderFunctionArgs) => {
+	await getUser(args.request)
 	const authorsPromise = async () => {
 		const data = await supabase.from("authors").select("*")
 

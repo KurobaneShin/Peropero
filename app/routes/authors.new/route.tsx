@@ -5,6 +5,7 @@ import { FormControl } from "~/components/custom/FormControl"
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
 import { supabase } from "~/infra/supabase"
+import { getUser } from "~/lib/getUser"
 import { makeForm } from "~/lib/makeForm"
 
 const { parse } = makeForm(
@@ -14,6 +15,7 @@ const { parse } = makeForm(
 )
 
 export const action = async (args: ActionFunctionArgs) => {
+	await getUser(args.request)
 	const formData = await args.request.formData()
 	const { data, errors } = parse(formData)
 

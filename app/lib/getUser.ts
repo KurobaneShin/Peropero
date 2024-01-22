@@ -6,8 +6,7 @@ export const getUser = async (req: Request): Promise<string> => {
 	const session = await accessToken.getSession(req.headers.get("Cookie"))
 
 	if (!session.has("accessToken")) {
-		//@ts-ignore
-		return redirect("/signin")
+		throw redirect("/signin")
 	}
 
 	const jwt = session.get("accessToken")
@@ -15,8 +14,7 @@ export const getUser = async (req: Request): Promise<string> => {
 	const { sub: userId, exp } = jwtDecode<{ sub: string; exp: number }>(jwt)
 
 	if (exp * 1000 < Date.now()) {
-		//@ts-ignore
-		return redirect("/signin")
+		throw redirect("/signin")
 	}
 
 	return userId
