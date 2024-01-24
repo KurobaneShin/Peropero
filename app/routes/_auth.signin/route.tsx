@@ -8,11 +8,14 @@ import { z } from "zod"
 import { supabase } from "~/infra/supabase"
 import { accessToken } from "~/cookies"
 import { makeForm } from "~/lib/makeForm"
+import { useRef, useState } from "react"
 
+import Hcaptcha from "@hcaptcha/react-hcaptcha"
 const { parse } = makeForm(
 	z.object({
 		email: z.string().email(),
 		password: z.string().min(6),
+		captchaToken: z.string(),
 	}),
 )
 
@@ -41,6 +44,7 @@ export const action = async (agrs: ActionFunctionArgs) => {
 	const { data: user, error } = await supabase.auth.signInWithPassword({
 		email: email,
 		password: password,
+		options: { captchaToken: data.captchaToken },
 	})
 
 	if (error || !user.user || !user) {
@@ -68,7 +72,12 @@ export const action = async (agrs: ActionFunctionArgs) => {
 
 export default function SignIn() {
 	const actionData = useActionData<typeof action>()
-	console.log(actionData)
+	const [captchaToken, setCaptchaToken] = useState("")
+	const captchaRef = useRef<any>()
+
+	if (actionData?.errors) {
+		captchaRef.current?.execute()
+	}
 	return (
 		<div>
 			---------------------
@@ -82,6 +91,12 @@ export default function SignIn() {
 					<label htmlFor="password">Password</label>
 					<input type="password" name="password" />
 				</div>
+				<Hcaptcha
+					ref={captchaRef}
+					sitekey={"21327b3d-ef5c-4bb1-abfd-4227f319f9e3"}
+					onVerify={(token) => setCaptchaToken(token)}
+				/>
+				<input type="hidden" name="captchaToken" value={captchaToken} />
 				<button type="submit">Enviar</button>
 			</form>
 		</div>

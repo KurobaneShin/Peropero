@@ -19,6 +19,7 @@
     "gentypes": "supabase gen types typescript --db-url postgresql://postgres:postgres@127.0.0.1:54322/postgres > database.types.ts"
   },
   "dependencies": {
+    "@hcaptcha/react-hcaptcha": "^1.9.3",
     "@radix-ui/react-context-menu": "^2.1.5",
     "@radix-ui/react-dialog": "^1.0.5",
     "@radix-ui/react-label": "^2.0.2",
