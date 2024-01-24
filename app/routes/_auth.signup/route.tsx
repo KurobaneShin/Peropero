@@ -41,6 +41,7 @@ export const action = async (agrs: ActionFunctionArgs) => {
 	})
 
 	if (error || !user.user) {
+		//todo 'captcha verification process failed' handle captcha error
 		return { errors: { email: error?.message ?? "error" } }
 	}
 

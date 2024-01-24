@@ -86,8 +86,6 @@ function handlePageUploads(files: Blob[]) {
 			.from("pages")
 			.upload(`pages-${Math.random().toString(36).substring(7)}.jpg`, file)
 			.then((res) => {
-				console.log(res)
-				if (res.error) throw res.error
 				return res.data?.path
 			})
 			.catch((e) => console.log(e)),
@@ -99,28 +97,20 @@ async function handleCoverUpload(file: Blob) {
 		.from("covers")
 		.upload(`covers-${Math.random().toString(36).substring(7)}.jpg`, file)
 		.then((res) => res.data?.path)
-		.catch((e) => console.log(e))
 }
 
 export const action = async ({ request }: ActionFunctionArgs) => {
 	try {
 		const { data, errors } = parse(await request.formData())
 		if (errors) {
-			console.log(errors)
 			return { errors }
 		}
-
-		console.log("aqui")
 
 		const uploadPromises = handlePageUploads(data.file)
 
 		const coverUpload = await handleCoverUpload(data.cover)
 
-		console.log(coverUpload)
-
 		const uploadResults = await Promise.all(uploadPromises)
-
-		console.log(uploadResults)
 
 		const { data: newManga, error: mangaError } = await supabase
 			.from("mangas")
@@ -131,7 +121,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 			.select()
 
 		if (mangaError) {
-			console.log(mangaError)
 			return { errors: mangaError }
 		}
 
@@ -174,7 +163,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 		return redirect(`/mangas/${newManga?.[0]?.id}`)
 	} catch (e) {
-		console.log(e)
 		return e
 	}
 }

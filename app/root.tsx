@@ -57,7 +57,7 @@ function App() {
 				<Links />
 			</head>
 			<body>
-				<div className="grid grid-cols-5">
+				<div className="grid grid-cols-4 lg:grid-cols-5">
 					<Sidebar playlists={[]} className="hidden lg:block" />
 					<div className="col-span-4">
 						<Outlet />

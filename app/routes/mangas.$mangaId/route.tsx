@@ -53,7 +53,7 @@ export default function MangaId() {
 							/>
 						</CardContent>
 						<CardContent className="w-full lg:w-1/2 space-y-2">
-							<CardHeader className="font-bold text-3xl">
+							<CardHeader className="font-bold text-3xl break-words">
 								{manga.title}
 							</CardHeader>
 							<h2 className="text-xl font-bold">Authors</h2>

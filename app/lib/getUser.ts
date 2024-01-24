@@ -12,8 +12,7 @@ export const getUser = async (req: Request): Promise<string> => {
 	const jwt = session.get("accessToken")
 
 	const { sub: userId, exp } = jwtDecode<{ sub: string; exp: number }>(jwt)
-
-	if (exp * 1000 < Date.now()) {
+	if (Date.now() >= exp * 1000) {
 		throw redirect("/signin")
 	}
 

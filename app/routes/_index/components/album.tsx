@@ -62,8 +62,7 @@ export function AlbumArtwork({
 							id={album.id?.toString() as string}
 							title={album.title}
 							cover={album.cover}
-							pages={pages}
-						>
+							pages={pages}>
 							<img
 								src={album.cover}
 								alt={album.title}
@@ -89,8 +88,8 @@ export function AlbumArtwork({
 				</ContextMenuContent>
 			</ContextMenu>
 			<div className="space-y-1 text-sm">
-				<h3 className="font-medium leading-none">{album.title}</h3>
-				<p className="text-xs text-muted-foreground">{album.artist}</p>
+				<h3 className="font-medium leading-none truncate">{album.title}</h3>
+				<p className="text-xs text-muted-foreground truncate">{album.artist}</p>
 			</div>
 		</div>
 	)
