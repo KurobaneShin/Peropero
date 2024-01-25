@@ -5,10 +5,14 @@ export const getMangaDetails = async (mangaId: string) => {
 		.from("mangas")
 		.select("*,pages(*),mangas_tags(tags(*)),mangas_authors(authors(*))")
 		.eq("id", Number(mangaId))
+		.order("page", {
+			ascending: true,
+			referencedTable: "pages",
+		})
 
 	if (error) {
-		return { error }
+		throw error.message
 	}
 
-	return { data: data[0] }
+	return data[0]
 }
