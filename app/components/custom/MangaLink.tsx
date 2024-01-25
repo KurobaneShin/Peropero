@@ -5,6 +5,7 @@ export function MangaLink({
 	id,
 	children,
 	pages,
+	cover,
 }: {
 	id: string
 	cover: string
@@ -27,6 +28,11 @@ export function MangaLink({
 	const prefetchImage = () => {
 		if (prefetch === "none") return
 
+		if (cover) {
+			const img = new Image()
+			img.src = cover
+		}
+
 		if (pages) {
 			for (const page of pages) {
 				const img = new Image()
@@ -40,8 +46,7 @@ export function MangaLink({
 			to={`/mangas/${id}`}
 			prefetch={prefetch as any}
 			onMouseEnter={prefetchImage}
-			onFocus={prefetchImage}
-		>
+			onFocus={prefetchImage}>
 			{children}
 		</Link>
 	)

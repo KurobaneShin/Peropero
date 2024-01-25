@@ -1,4 +1,4 @@
-import { defer, LoaderFunctionArgs } from "@remix-run/node"
+import { defer, LoaderFunctionArgs, MetaFunction } from "@remix-run/node"
 import {
 	Await,
 	ClientLoaderFunctionArgs,
@@ -8,6 +8,7 @@ import { Suspense } from "react"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader } from "~/components/ui/card"
+import { Skeleton } from "~/components/ui/skeleton"
 import { getMangaDetails } from "~/repositories/mangas"
 
 export const loader = (args: LoaderFunctionArgs) => {
@@ -21,10 +22,14 @@ export const loader = (args: LoaderFunctionArgs) => {
 		{ manga: getMangaDetails(mangaId) },
 		{
 			headers: {
-				"Cache-Control": "public, max-age=3600, s-maxage=3600",
+				"Cache-Control": "max-age=3600, public",
 			},
 		},
 	)
+}
+
+export const meta: MetaFunction = () => {
+	return [{ title: "Manga" }, { name: "description", content: "manga screen" }]
 }
 
 export async function clientLoader({
@@ -34,7 +39,9 @@ export async function clientLoader({
 	const cacheKey = `/mangas/${params.mangaId}`
 	const cache = sessionStorage.getItem(cacheKey)
 
-	if (cache) return JSON.parse(cache)
+	if (cache) {
+		return JSON.parse(cache)
+	}
 
 	const loaderData = await serverLoader<typeof loader>()
 
@@ -53,7 +60,16 @@ export default function MangaId() {
 			<main className=" px-4 mx-auto py-6">
 				<div className="grid lg:grid-cols-[1fr] gap-6 lg:gap-12 items-start">
 					<Card className="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4 h-fit">
-						<Suspense fallback={<div>Loading...</div>}>
+						<Suspense
+							fallback={
+								<>
+									<CardContent className="w-full lg:w-1/2">
+										<div className="aspect-[2/3] h-[44rem] w-[28rem] object-cover border border-gray-200  rounded-lg overflow-hidden dark:border-gray-800">
+											<Skeleton className="h-full w-full" />
+										</div>
+									</CardContent>
+								</>
+							}>
 							<Await resolve={mangPromise}>
 								{(manga) => (
 									<>
