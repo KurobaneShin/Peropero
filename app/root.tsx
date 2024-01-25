@@ -78,7 +78,7 @@ function App() {
 				</div>
 
 				<div className="grid grid-cols-4 lg:grid-cols-5">
-					<Sidebar playlists={[]} className="hidden lg:block" />
+					<Sidebar playlists={[]} className="hidden lg:block border-r" />
 					<div className="col-span-4">
 						<Outlet />
 					</div>

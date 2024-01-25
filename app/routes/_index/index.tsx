@@ -77,7 +77,7 @@ export default function Index() {
 	const { mangas, newestMangas } = useLoaderData<typeof loader>()
 	return (
 		<div className="grid lg:grid-cols-4">
-			<div className="col-span-3 lg:col-span-4 border-l">
+			<div className="col-span-3 lg:col-span-4 ">
 				<div className="h-full px-4 py-6 lg:px-8">
 					<Tabs defaultValue="mangas" className="h-full space-y-6">
 						<div className="space-between flex items-center">
