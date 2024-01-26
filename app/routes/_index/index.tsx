@@ -27,7 +27,6 @@ export const meta: MetaFunction = () => {
 // biome-ignore lint/nursery/useAwait: <explanation>
 export const loader = async () => {
 	const getMangas = async () => {
-		await new Promise((resolve) => setTimeout(resolve, 2000))
 		const { data, error } = await supabase
 			.from("mangas")
 			.select("*,pages(*),mangas_authors(authors(*))")
@@ -39,7 +38,6 @@ export const loader = async () => {
 		return data
 	}
 	const getNewestMangas = async () => {
-		await new Promise((resolve) => setTimeout(resolve, 1000))
 		const { data, error } = await supabase
 			.from("mangas")
 			.select("*,pages(*),mangas_authors(authors(*))")
