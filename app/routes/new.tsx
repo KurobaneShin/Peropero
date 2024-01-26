@@ -1,4 +1,3 @@
-import { Label } from "@radix-ui/react-label"
 import {
 	ActionFunctionArgs,
 	defer,
@@ -22,10 +21,11 @@ import { Combobox } from "~/components/custom/multipleCombobox"
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
 import { useObjectUrls } from "~/hooks/useOjectUrls"
-import { supabase, superSupabase } from "~/infra/supabase"
+import { supabase } from "~/infra/supabase"
 import { makeForm } from "~/lib/makeForm"
 import { AlbumArtwork } from "./_index/components/album"
 import { getUser } from "~/lib/getUser"
+import { Label } from "~/components/ui/label"
 
 const { parse } = makeForm(
 	z.object({
