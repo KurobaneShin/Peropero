@@ -6,6 +6,7 @@ export const getUser = async (req: Request): Promise<string> => {
 	const session = await accessToken.getSession(req.headers.get("Cookie"))
 
 	if (!session.has("accessToken")) {
+		console.log("no access token")
 		throw redirect("/signin")
 	}
 

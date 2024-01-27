@@ -1,10 +1,10 @@
 import { Link } from "@remix-run/react"
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 
 type PageLinkProps = {
 	to: string
 	className?: string
-	children?: React.ReactNode | Element[]
+	children?: React.ReactNode
 	page: number
 	mangaId: string
 	image: string
@@ -40,6 +40,7 @@ export function PageLink({
 	return (
 		<Link
 			to={to}
+			aria-label={`Page ${page}`}
 			prefetch={prefetch as "render" | "intent" | "none"}
 			onMouseEnter={prefetchImage}
 			onFocus={prefetchImage}

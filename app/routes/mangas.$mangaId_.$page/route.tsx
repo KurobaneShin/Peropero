@@ -136,7 +136,12 @@ export default function handler() {
 							<Pagination>
 								<PaginationContent>
 									<PaginationItem>
-										<Button variant="outline">
+										<Button
+											variant="outline"
+											id="firstPage"
+											aria-label="First Page"
+											role="link"
+											aria-labelledby="firstPage">
 											<PageLink
 												className="flex"
 												page={firstPage}
@@ -181,7 +186,12 @@ export default function handler() {
 									</PaginationItem>
 
 									<PaginationItem>
-										<Button variant="outline">
+										<Button
+											variant="outline"
+											id="lastPage"
+											aria-label="Last Page"
+											role="link"
+											aria-labelledby="lastPage">
 											<PageLink
 												page={lastPage}
 												image={manga?.pages?.[lastPage]?.image}

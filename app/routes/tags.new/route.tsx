@@ -1,4 +1,8 @@
-import { ActionFunctionArgs, redirect } from "@remix-run/node"
+import {
+	ActionFunctionArgs,
+	LoaderFunctionArgs,
+	redirect,
+} from "@remix-run/node"
 import { ClientActionFunctionArgs, Form } from "@remix-run/react"
 import { z } from "zod"
 import { InputWithLabel } from "~/components/custom/inputWithLabel"
@@ -13,8 +17,12 @@ const { parse } = makeForm(
 	}),
 )
 
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+	await getUser(request)
+	return {}
+}
+
 export const action = async (args: ActionFunctionArgs) => {
-	await getUser(args.request)
 	const formData = await args.request.formData()
 	const { data, errors } = parse(formData)
 

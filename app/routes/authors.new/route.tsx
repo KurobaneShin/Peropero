@@ -14,8 +14,12 @@ const { parse } = makeForm(
 	}),
 )
 
+export const loader = async ({ request }: ActionFunctionArgs) => {
+	await getUser(request)
+	return {}
+}
+
 export const action = async (args: ActionFunctionArgs) => {
-	await getUser(args.request)
 	const formData = await args.request.formData()
 	const { data, errors } = parse(formData)
 

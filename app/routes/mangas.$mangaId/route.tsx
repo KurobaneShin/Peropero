@@ -11,17 +11,28 @@ import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader } from "~/components/ui/card"
 import { Skeleton } from "~/components/ui/skeleton"
+import { supabase } from "~/infra/supabase"
 import { getMangaDetails } from "~/repositories/mangas"
 
-export const loader = (args: LoaderFunctionArgs) => {
+export const loader = async (args: LoaderFunctionArgs) => {
 	const { mangaId } = args.params
 
 	if (!mangaId) {
 		throw new Error("Manga id is required")
 	}
 
+	const { data, error } = await supabase
+		.from("mangas")
+		.select("title")
+		.eq("id", Number(mangaId))
+		.maybeSingle()
+
+	if (!data || error) {
+		throw new Error("Manga not found")
+	}
+
 	return defer(
-		{ manga: getMangaDetails(mangaId) },
+		{ manga: getMangaDetails(mangaId), title: data.title },
 		{
 			headers: {
 				"Cache-Control": "max-age=3600, public",
@@ -30,8 +41,14 @@ export const loader = (args: LoaderFunctionArgs) => {
 	)
 }
 
-export const meta: MetaFunction = () => {
-	return [{ title: "Manga" }, { name: "description", content: "manga screen" }]
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+	return [
+		{ title: data?.title ?? "Manga" },
+		{
+			name: "description",
+			content: "manga screen",
+		},
+	]
 }
 
 export async function clientLoader({
@@ -49,8 +66,11 @@ export async function clientLoader({
 
 	const manga = await loaderData.manga
 
-	sessionStorage.setItem(cacheKey, JSON.stringify({ manga }))
-	return { manga }
+	sessionStorage.setItem(
+		cacheKey,
+		JSON.stringify({ manga, title: loaderData.title }),
+	)
+	return { manga, title: loaderData.title }
 }
 
 clientLoader.hydrate = true
