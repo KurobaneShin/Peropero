@@ -1,4 +1,4 @@
-import { LoaderFunctionArgs } from "@remix-run/node"
+import { LoaderFunctionArgs, redirect } from "@remix-run/node"
 import {
 	Link,
 	Links,
@@ -8,6 +8,8 @@ import {
 	Scripts,
 	ScrollRestoration,
 	useLoaderData,
+	useLocation,
+	useNavigate,
 	useNavigation,
 } from "@remix-run/react"
 import clsx from "clsx"
@@ -44,7 +46,6 @@ export default function AppWithProviders() {
 }
 function App() {
 	const data = useLoaderData<typeof loader>()
-
 	const transition = useNavigation()
 
 	// nprogress

@@ -3,7 +3,6 @@ import { Form, useActionData } from "@remix-run/react"
 import { z } from "zod"
 import { InputWithLabel } from "~/components/custom/inputWithLabel"
 import { Button } from "~/components/ui/button"
-import { zfd } from "zod-form-data"
 import { accessToken } from "~/cookies"
 import { supabase } from "~/infra/supabase"
 import { makeForm } from "~/lib/makeForm"
@@ -44,6 +43,10 @@ export const action = async (agrs: ActionFunctionArgs) => {
 		email: data.email,
 		id: user.user.id,
 	})
+
+	if (process.env.NODE_ENV === "production") {
+		return redirect("/confirm-email")
+	}
 
 	const headers = new Headers()
 	const session = await accessToken.getSession(

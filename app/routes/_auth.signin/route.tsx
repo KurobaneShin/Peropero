@@ -51,6 +51,14 @@ export const action = async (agrs: ActionFunctionArgs) => {
 	})
 
 	if (error || !user.user || !user) {
+		if (error?.message === "Email not confirmed") {
+			return {
+				errors: {
+					email: error.message,
+				},
+			}
+		}
+
 		return {
 			trueError: error,
 			errors: {
@@ -83,9 +91,7 @@ export default function SignIn() {
 	const actionData = useActionData<typeof action>()
 	const [captchaToken, setCaptchaToken] = useState("")
 	const captchaRef = useRef<any>()
-	if (actionData.trueError) {
-		console.log(actionData?.trueError)
-	}
+
 	if (actionData?.errors) {
 		captchaRef.current?.execute()
 	}
