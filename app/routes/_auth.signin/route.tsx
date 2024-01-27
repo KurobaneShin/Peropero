@@ -3,7 +3,7 @@ import {
 	type LoaderFunctionArgs,
 	redirect,
 } from "@remix-run/node"
-import { Link, useActionData, useLoaderData } from "@remix-run/react"
+import { Form, Link, useActionData, useLoaderData } from "@remix-run/react"
 import { z } from "zod"
 import { supabase } from "~/infra/supabase"
 import { accessToken } from "~/cookies"
@@ -58,9 +58,17 @@ export const action = async (agrs: ActionFunctionArgs) => {
 		}
 	}
 
+	const { data: profile } = await supabase
+		.from("profiles")
+		.select("*")
+		.eq("id", user.user.id)
+		.single()
+
 	const headers = new Headers()
 
 	session.set("accessToken", user.session?.access_token)
+	session.set("profile", profile)
+
 	headers.append("Set-Cookie", await accessToken.commitSession(session))
 
 	return redirect("/", {
@@ -79,7 +87,7 @@ export default function SignIn() {
 		captchaRef.current?.execute()
 	}
 	return (
-		<form method="post">
+		<Form method="post">
 			<Card>
 				<CardHeader className="space-y-1">
 					<CardTitle className="text-2xl">Sign in to your account</CardTitle>
@@ -93,7 +101,12 @@ export default function SignIn() {
 							label="E-mail"
 							name="email"
 							errors={actionData?.errors}>
-							<Input id="email" type="email" placeholder="m@example.com" />
+							<Input
+								id="email"
+								name="email"
+								type="email"
+								placeholder="m@example.com"
+							/>
 						</FormControl>
 					</div>
 					<div className="grid gap-2">
@@ -101,7 +114,7 @@ export default function SignIn() {
 							label="Password"
 							name="password"
 							errors={actionData?.errors}>
-							<Input id="password" type="password" />
+							<Input id="password" name="password" type="password" />
 						</FormControl>
 					</div>
 					<FormControl name="captchaToken" errors={actionData?.errors}>
@@ -124,6 +137,6 @@ export default function SignIn() {
 					</div>
 				</CardFooter>
 			</Card>
-		</form>
+		</Form>
 	)
 }

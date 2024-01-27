@@ -10,13 +10,6 @@ import { makeForm } from "~/lib/makeForm"
 import { useRef, useState } from "react"
 import Hcaptcha from "@hcaptcha/react-hcaptcha"
 
-const adminFormSchema = zfd.formData({
-	name: zfd.text(z.string().min(3)),
-	email: zfd.text(z.string().email()),
-	password: zfd.text(z.string().min(6)),
-	captchaToken: zfd.text(z.string()),
-})
-
 const { parse } = makeForm(
 	z.object({
 		name: z.string(),

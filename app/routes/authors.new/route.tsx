@@ -1,4 +1,8 @@
-import { ActionFunctionArgs, redirect } from "@remix-run/node"
+import {
+	ActionFunctionArgs,
+	LoaderFunctionArgs,
+	redirect,
+} from "@remix-run/node"
 import { ClientActionFunctionArgs, Form } from "@remix-run/react"
 import { z } from "zod"
 import { FormControl } from "~/components/custom/FormControl"
@@ -14,7 +18,7 @@ const { parse } = makeForm(
 	}),
 )
 
-export const loader = async ({ request }: ActionFunctionArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
 	await getUser(request)
 	return {}
 }

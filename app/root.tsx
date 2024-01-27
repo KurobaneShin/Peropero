@@ -14,19 +14,26 @@ import clsx from "clsx"
 import nProgress from "nprogress"
 import { useEffect } from "react"
 import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from "remix-themes"
-import { themeSessionResolver } from "./cookies"
+import { accessToken, themeSessionResolver } from "./cookies"
 import "./globals.css"
 import { Sidebar } from "./routes/_index/components/sidebar"
 import { Button } from "./components/ui/button"
 import { ModeToggle } from "./components/custom/modeToggle"
 import { DrawerSidebar } from "./components/custom/drawerSidebar"
+import { UserAvatar } from "./components/custom/UserAvatar"
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const { getTheme } = await themeSessionResolver(request)
+
+	const session = await accessToken.getSession(request.headers.get("Cookie"))
+	const user = session.get("profile")
+
 	return {
 		theme: getTheme(),
+		user,
 	}
 }
+
 export default function AppWithProviders() {
 	const data = useLoaderData<typeof loader>()
 	return (
@@ -71,9 +78,13 @@ function App() {
 					</div>
 					<div className="ml-auto flex items-center space-x-4">
 						<ModeToggle />
-						<Link to="/signin" prefetch="intent">
-							<Button>Sign in</Button>
-						</Link>
+						{data.user ? (
+							<UserAvatar userName={data.user.username} />
+						) : (
+							<Link to="/signin" prefetch="intent">
+								<Button>Sign in</Button>
+							</Link>
+						)}
 					</div>
 				</div>
 
