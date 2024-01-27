@@ -34,6 +34,7 @@ export const action = async (agrs: ActionFunctionArgs) => {
 	})
 
 	if (error || !user.user) {
+		console.error(error)
 		//todo 'captcha verification process failed' handle captcha error
 		return { errors: { email: error?.message ?? "error" } }
 	}
@@ -48,7 +49,15 @@ export const action = async (agrs: ActionFunctionArgs) => {
 	const session = await accessToken.getSession(
 		agrs.request.headers.get("cookie"),
 	)
+	const { data: profile } = await supabase
+		.from("profiles")
+		.select("*")
+		.eq("id", user.user.id)
+		.single()
+
 	session.set("accessToken", user.session?.access_token)
+
+	session.set("profile", profile)
 	headers.append("Set-Cookie", await accessToken.commitSession(session))
 
 	return redirect("/", {
