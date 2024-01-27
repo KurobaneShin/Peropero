@@ -2,7 +2,9 @@ import { defer, LoaderFunctionArgs, MetaFunction } from "@remix-run/node"
 import {
 	Await,
 	ClientLoaderFunctionArgs,
+	Link,
 	useLoaderData,
+	useParams,
 } from "@remix-run/react"
 import { Suspense } from "react"
 import { Badge } from "~/components/ui/badge"
@@ -55,6 +57,7 @@ clientLoader.hydrate = true
 
 export default function MangaId() {
 	const { manga: mangPromise } = useLoaderData<typeof loader>()
+	const params = useParams()
 	return (
 		<div>
 			<main className=" px-4 mx-auto py-6">
@@ -160,27 +163,31 @@ export default function MangaId() {
 									{(manga) => (
 										<div className="grid gap-2 md:grid-cols-5">
 											{manga.pages.map((page) => (
-												<div
-													key={page.id}
-													className="flex flex-col gap-4 items-center">
-													<img
-														alt="Manga Page"
-														className="aspect-[2/3] h-96  object-cover border border-gray-200 w-64 rounded-lg overflow-hidden dark:border-gray-800"
-														height={125}
-														src={page.image}
-														width={75}
-													/>
-													<div>{page.page}</div>
-												</div>
+												<Link
+													to={`/mangas/${manga.id}/${page.page}`}
+													prefetch="intent"
+													key={page.id}>
+													<div className="flex flex-col gap-4 items-center">
+														<img
+															alt="Manga Page"
+															className="aspect-[2/3] h-96  object-cover border border-gray-200 w-64 rounded-lg overflow-hidden dark:border-gray-800"
+															height={125}
+															src={page.image}
+															width={75}
+														/>
+														<div>{page.page}</div>
+													</div>
+												</Link>
 											))}
 										</div>
 									)}
 								</Await>
 							</Suspense>
-
-							<Button className="mt-4 bg-black text-white w-full py-2 rounded-md">
-								Read Now
-							</Button>
+							<Link to={`/mangas/${params.mangaId}/${1}`} prefetch="intent">
+								<Button className="mt-4 bg-black text-white w-full py-2 rounded-md">
+									Read Now
+								</Button>
+							</Link>
 						</CardContent>
 					</Card>
 				</div>

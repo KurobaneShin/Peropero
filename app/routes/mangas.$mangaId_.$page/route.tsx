@@ -1,4 +1,4 @@
-import { defer, LoaderFunctionArgs } from "@remix-run/node"
+import { defer, LoaderFunctionArgs, MetaFunction } from "@remix-run/node"
 import {
 	Await,
 	ClientLoaderFunctionArgs,
@@ -18,13 +18,24 @@ import {
 	PaginationItem,
 } from "~/components/ui/pagination"
 import { Button } from "~/components/ui/button"
-import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
+import { PageLink } from "./PageLink"
 
-export const loader = (args: LoaderFunctionArgs) => {
+export const loader = async (args: LoaderFunctionArgs) => {
 	const { mangaId, page } = args.params
 
 	if (!mangaId || !page) {
 		throw new Error("Manga id and page is required")
+	}
+
+	const { data, error } = await supabase
+		.from("mangas")
+		.select("title")
+		.eq("id", Number(mangaId))
+		.maybeSingle()
+
+	if (!data || error) {
+		throw new Error("Manga not found")
 	}
 
 	const getPage = async () => {
@@ -43,13 +54,24 @@ export const loader = (args: LoaderFunctionArgs) => {
 	}
 
 	return defer(
-		{ page: getPage(), manga: getMangaDetails(mangaId) },
+		{
+			title: data.title,
+			page: getPage(),
+			manga: getMangaDetails(mangaId),
+		},
 		{
 			headers: {
 				"Cache-Control": "max-age=3600, public",
 			},
 		},
 	)
+}
+
+export const meta: MetaFunction<typeof loader> = ({ data, params }) => {
+	return [
+		{ title: `${data?.title ?? "Manga"} | ${params.page}` },
+		{ name: "description", content: `${data?.title} | ${params.page}` },
+	]
 }
 
 export async function clientLoader({
@@ -67,28 +89,34 @@ export async function clientLoader({
 
 	const manga = await loaderData.manga
 	const page = await loaderData.page
-	sessionStorage.setItem(cacheKey, JSON.stringify({ manga, page }))
-	return { manga, page }
+
+	sessionStorage.setItem(
+		cacheKey,
+		JSON.stringify({ manga, page, title: loaderData.title }),
+	)
+
+	return { manga, page, title: loaderData.title }
 }
 
 clientLoader.hydrate = true
 
 export default function handler() {
 	const { page, manga } = useLoaderData<typeof loader>()
-
 	const params = useParams()
 
 	return (
-		<div>
+		<div className="mt-8 flex flex-col gap-4">
 			<Suspense fallback={<Skeleton />}>
 				<Await resolve={page}>
 					{(page) => {
 						return (
-							<img
-								alt="Manga Cover"
-								className="aspect-[2/3] h-[44rem] w-[28rem] object-cover border border-gray-200  rounded-lg overflow-hidden dark:border-gray-800"
-								src={page?.image}
-							/>
+							<div className="mx-auto flex w-full justify-center">
+								<img
+									alt="Manga Cover"
+									className="aspect-[2/3] h-[44rem] w-[28rem] object-cover border border-gray-200  rounded-lg overflow-hidden dark:border-gray-800"
+									src={page?.image}
+								/>
+							</div>
 						)
 					}}
 				</Await>
@@ -100,17 +128,25 @@ export default function handler() {
 						const firstPage = manga?.pages?.[0]?.page
 						const lastPage = manga?.pages?.slice(-1)[0]?.page
 
+						const previous = Number(params.page) - 1
+						const next = Number(params.page) + 1
+						const mangaId = manga?.id.toString()
+
 						return (
 							<Pagination>
 								<PaginationContent>
 									<PaginationItem>
 										<Button variant="outline">
-											<Link
+											<PageLink
 												className="flex"
-												to={`/mangas/${manga?.id}/${firstPage}`}>
+												page={firstPage}
+												mangaId={mangaId}
+												prefetch="render"
+												image={manga?.pages?.[0]?.image}
+												to={`/mangas/${mangaId}/${firstPage}`}>
 												<ChevronLeft />
 												<ChevronLeft className="ml-[-2rem]" />
-											</Link>
+											</PageLink>
 										</Button>
 									</PaginationItem>
 
@@ -118,10 +154,14 @@ export default function handler() {
 										<Button
 											variant="outline"
 											disabled={Number(params.page) === firstPage}>
-											<Link
-												to={`/mangas/${manga?.id}/${Number(params.page) - 1}`}>
+											<PageLink
+												prefetch="render"
+												page={previous}
+												image={manga?.pages?.[previous]?.image}
+												mangaId={mangaId}
+												to={`/mangas/${mangaId}/${previous}`}>
 												Previous
-											</Link>
+											</PageLink>
 										</Button>
 									</PaginationItem>
 
@@ -129,21 +169,29 @@ export default function handler() {
 										<Button
 											variant="outline"
 											disabled={Number(params.page) === lastPage}>
-											<Link
-												to={`/mangas/${manga?.id}/${Number(params.page) + 1}`}>
+											<PageLink
+												prefetch="render"
+												mangaId={mangaId}
+												image={manga?.pages?.[next]?.image}
+												page={next}
+												to={`/mangas/${mangaId}/${next}`}>
 												Next
-											</Link>
+											</PageLink>
 										</Button>
 									</PaginationItem>
 
 									<PaginationItem>
 										<Button variant="outline">
-											<Link
+											<PageLink
+												page={lastPage}
+												image={manga?.pages?.[lastPage]?.image}
+												prefetch="render"
+												mangaId={mangaId}
 												className="flex"
-												to={`/mangas/${manga?.id}/${lastPage}`}>
+												to={`/mangas/${mangaId}/${lastPage}`}>
 												<ChevronRight className="mr-[-2rem]" />
 												<ChevronRight />
-											</Link>
+											</PageLink>
 										</Button>
 									</PaginationItem>
 								</PaginationContent>
