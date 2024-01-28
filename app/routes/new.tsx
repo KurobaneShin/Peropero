@@ -87,7 +87,7 @@ function handlePageUploads(files: Blob[]) {
 	return files.map(async (file) =>
 		supabase.storage
 			.from("pages")
-			.upload(`pages-${Math.random().toString(36).substring(7)}.jpg`, file)
+			.upload(`pages-${Math.random().toString(36).substring(7)}`, file)
 			.then((res) => {
 				return res.data?.path
 			})
@@ -98,7 +98,7 @@ function handlePageUploads(files: Blob[]) {
 async function handleCoverUpload(file: Blob) {
 	return supabase.storage
 		.from("covers")
-		.upload(`covers-${Math.random().toString(36).substring(7)}.jpg`, file)
+		.upload(`covers-${Math.random().toString(36).substring(7)}`, file)
 		.then((res) => res.data?.path)
 }
 
@@ -291,7 +291,7 @@ export default function New() {
 			<Input
 				type="file"
 				multiple={true}
-				onClick={(e) => {
+				onClick={() => {
 					setFiles([])
 				}}
 				onChange={(e) => {

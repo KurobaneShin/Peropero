@@ -113,7 +113,7 @@ export default function handler() {
 							<div className="mx-auto flex w-full justify-center">
 								<img
 									alt="Manga Cover"
-									className="aspect-[2/3] h-[44rem] w-[28rem] object-cover border border-gray-200  rounded-lg overflow-hidden dark:border-gray-800"
+									className="aspect-[2/3] h-[80rem] w-[52rem] object-cover border border-gray-200  rounded-lg overflow-hidden dark:border-gray-800"
 									src={page?.image}
 								/>
 							</div>
