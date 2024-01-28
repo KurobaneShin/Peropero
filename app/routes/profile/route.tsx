@@ -39,7 +39,7 @@ export const action = async (args: ActionFunctionArgs) => {
 }
 
 export default function ProfileRoute() {
-	const [file, setFile] = useState<string[]>([])
+	const [file, setFile] = useState<string>("")
 
 	const getObjectUrl = useObjectUrls()
 
@@ -53,31 +53,23 @@ export default function ProfileRoute() {
 					accept="image/*"
 					onChange={(event) => {
 						if (event.target.files?.length) {
-							transformFileToWebp(
-								Array.from(event.target.files),
-								getObjectUrl,
-								setFile,
-							)
+							transformFileToWebp(event.target.files[0], getObjectUrl, setFile)
 						}
 					}}
 				/>
 
-				{file.map((file, idx) => (
-					<div key={idx}>
-						<input value={file} type="hidden" name="profile" />
+				<input value={file} type="hidden" name="profile" />
 
-						<AlbumArtwork
-							hasContextMenu={false}
-							className="w-[250px]"
-							aspectRatio="portrait"
-							album={{
-								title: "test",
-								artist: "test",
-								cover: file,
-							}}
-						/>
-					</div>
-				))}
+				<AlbumArtwork
+					hasContextMenu={false}
+					className="w-[250px]"
+					aspectRatio="portrait"
+					album={{
+						title: "test",
+						artist: "test",
+						cover: file,
+					}}
+				/>
 
 				<button type="submit">Submit</button>
 			</Form>

@@ -1,13 +1,21 @@
 import { Dispatch, SetStateAction } from "react"
 
-export const transformFileToWebp = (
+export const transformFilesToWebp = (
 	file: File,
+	page: number,
 	getObjectUrl: (file: File) => string,
-	setFile: Dispatch<SetStateAction<string>>,
+	setFile: Dispatch<
+		SetStateAction<
+			{
+				url: string
+				page: number
+			}[]
+		>
+	>,
 ) => {
 	const image = new Image()
 	image.src = getObjectUrl(file)
-	image.onload = (e) => {
+	image.onload = () => {
 		const canvas = document.createElement("canvas")
 		const ctx = canvas.getContext("2d")
 
@@ -18,6 +26,12 @@ export const transformFileToWebp = (
 
 		const url = canvas.toDataURL("image/webp", 0.1)
 
-		setFile(url)
+		setFile((prev) => [
+			...prev,
+			{
+				url,
+				page,
+			},
+		])
 	}
 }

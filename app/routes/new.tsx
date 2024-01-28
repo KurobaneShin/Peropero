@@ -27,6 +27,7 @@ import { AlbumArtwork } from "./_index/components/album"
 import { getUser } from "~/lib/getUser"
 import { Label } from "~/components/ui/label"
 import { transformFileToWebp } from "~/lib/transformFileToWebp"
+import { transformFilesToWebp } from "~/lib/transFilesToWebp"
 import { b64toBlob } from "~/lib/b64toBlob"
 
 const { parse } = makeForm(
@@ -184,9 +185,9 @@ export default function New() {
 	const { authors, tags } = useLoaderData<typeof loader>()
 	const { pathname } = useLocation()
 
-	const [files, setFiles] = useState<string[]>([])
+	const [files, setFiles] = useState<{ page: number; url: string }[]>([])
 
-	const [cover, setCover] = useState<string[]>([])
+	const [cover, setCover] = useState<string>("")
 	const [artists, setArtists] = useState<string[]>([])
 	const [selectedTags, setSelectedTags] = useState<string[]>([])
 
@@ -257,77 +258,87 @@ export default function New() {
 				type="file"
 				onChange={(e) => {
 					if (e.target.files?.length) {
-						transformFileToWebp(
-							Array.from(e.target.files),
-							getObjectUrl,
-							setCover,
-						)
-					}
-				}}
-			/>
-
-			<Button type="button" onClick={() => setCover([])}>
-				Clear
-			</Button>
-
-			<input type="hidden" name="cover" value={cover[0] ?? ""} />
-
-			{cover.length > 0 && (
-				<AlbumArtwork
-					hasContextMenu={false}
-					aspectRatio="portrait"
-					className="w-[150px]"
-					width={150}
-					height={150}
-					album={{
-						title: "",
-						cover: cover[0],
-						artist: "",
-					}}
-				/>
-			)}
-
-			<Label>Pages</Label>
-			<Input
-				type="file"
-				multiple={true}
-				onChange={(e) => {
-					if (e.target.files?.length) {
-						setLoadingPages(e.target.files.length)
-						transformFileToWebp(
-							Array.from(e.target.files),
-							getObjectUrl,
-							setFiles,
-						)
+						transformFileToWebp(e.target.files[0], getObjectUrl, setCover)
 					}
 				}}
 			/>
 
 			<div className="flex flex-row space-x-4 flex-wrap">
-				{loadingPages && <p>Processing {loadingPages} files</p>}
-				{files.map((file: string, idx) => (
-					<div key={idx}>
+				{cover.length > 0 && (
+					<>
+						<Button type="button" onClick={() => setCover("")}>
+							Clear
+						</Button>
+
+						<input type="hidden" name="cover" value={cover ?? ""} />
 						<AlbumArtwork
 							hasContextMenu={false}
-							key={idx}
 							aspectRatio="portrait"
 							className="w-[150px]"
 							width={150}
 							height={150}
 							album={{
 								title: "",
-								cover: file,
+								cover: cover,
 								artist: "",
 							}}
 						/>
-						<input value={file} type="hidden" name="file" />
-					</div>
-				))}
+					</>
+				)}
 			</div>
 
-			<Button type="button" onClick={() => setCover([])}>
-				Clear
-			</Button>
+			<Label>Pages</Label>
+			<Input
+				type="file"
+				multiple={true}
+				onClick={(e) => {
+					setFiles([])
+				}}
+				onChange={(e) => {
+					if (e.target.files?.length) {
+						setLoadingPages(e.target.files.length + files.length)
+
+						Array.from(e.target.files).forEach((file, idx) =>
+							transformFilesToWebp(file, idx + 1, getObjectUrl, setFiles),
+						)
+					}
+				}}
+			/>
+
+			<div className="flex flex-row space-x-4 ">
+				{loadingPages && <p>Processing {loadingPages} files</p>}
+				{files.length > 0 && (
+					<Button type="button" onClick={() => setFiles([])}>
+						Clear
+					</Button>
+				)}
+
+				<div className="grid grid-cols-6 gap-4">
+					{files
+						.sort((a, b) => a.page - b.page)
+						.map((file) => (
+							<div key={file.page}>
+								<AlbumArtwork
+									hasContextMenu={false}
+									key={file.page}
+									aspectRatio="portrait"
+									className="w-[150px]"
+									width={150}
+									height={150}
+									album={{
+										title: file.page.toString(),
+										cover: file.url,
+										artist: "",
+									}}
+								/>
+								<div>
+									<p>{file.page}</p>
+								</div>
+								<input value={file.url} type="hidden" name="file" />
+							</div>
+						))}
+				</div>
+			</div>
 
 			<Button disabled={!!loadingPages} type="submit">
 				Submit
