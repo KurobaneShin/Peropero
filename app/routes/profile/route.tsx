@@ -6,39 +6,21 @@ import { useObjectUrls } from "~/hooks/useOjectUrls"
 import { supabase, superSupabase } from "~/infra/supabase"
 import { makeForm } from "~/lib/makeForm"
 import { AlbumArtwork } from "../_index/components/album"
+import { transformFileToWebp } from "~/lib/transformFileToWebp"
+import { b64toBlob } from "~/lib/b64toBlob"
 
 const { parse } = makeForm(
 	z.object({
 		profile: z.string(),
 	}),
 )
+
 export const action = async (args: ActionFunctionArgs) => {
 	const data = parse(await args.request.formData())
 
 	if (data.errors) {
 		console.log(data.errors)
 		return {}
-	}
-
-	const b64toBlob = (b64Data: string, contentType = "", sliceSize = 512) => {
-		b64Data = b64Data.replace(/^data:image\/(png|jpg|jpeg|webp);base64,/, "")
-		const byteCharacters = atob(b64Data)
-		const byteArrays = []
-
-		for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-			const slice = byteCharacters.slice(offset, offset + sliceSize)
-
-			const byteNumbers = new Array(slice.length)
-			for (let i = 0; i < slice.length; i++) {
-				byteNumbers[i] = slice.charCodeAt(i)
-			}
-
-			const byteArray = new Uint8Array(byteNumbers)
-			byteArrays.push(byteArray)
-		}
-
-		const blob = new Blob(byteArrays, { type: contentType })
-		return blob
 	}
 
 	const blob = b64toBlob(data.data.profile, "image/webp")
@@ -60,30 +42,6 @@ export default function ProfileRoute() {
 	const [file, setFile] = useState<string[]>([])
 
 	const getObjectUrl = useObjectUrls()
-
-	const transformFileToWebp = (
-		files: File[],
-		getObjectUrl: (file: File) => string,
-		setFile: Dispatch<SetStateAction<string[]>>,
-	) => {
-		for (const file of files) {
-			const image = new Image()
-			image.src = getObjectUrl(file)
-			image.onload = () => {
-				const canvas = document.createElement("canvas")
-				const ctx = canvas.getContext("2d")
-
-				canvas.width = image.width
-				canvas.height = image.height
-
-				ctx?.drawImage(image, 0, 0)
-
-				const url = canvas.toDataURL("image/webp", 0.1)
-
-				setFile((prev) => [...prev, url])
-			}
-		}
-	}
 
 	return (
 		<div className="flex flex-col gap-4">
