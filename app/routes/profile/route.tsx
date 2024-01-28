@@ -1,6 +1,6 @@
 import { ActionFunctionArgs } from "@remix-run/node"
 import { Form } from "@remix-run/react"
-import { useState } from "react"
+import { Dispatch, SetStateAction, useState } from "react"
 import { z } from "zod"
 import { useObjectUrls } from "~/hooks/useOjectUrls"
 import { supabase, superSupabase } from "~/infra/supabase"
@@ -57,31 +57,37 @@ export const action = async (args: ActionFunctionArgs) => {
 }
 
 export default function ProfileRoute() {
-	const [file, setFile] = useState("")
+	const [file, setFile] = useState<string[]>([])
 
 	const getObjectUrl = useObjectUrls()
 
-	const transformFileToWebp = (file: File) => {
-		const image = new Image()
-		image.src = getObjectUrl(file)
-		image.onload = () => {
-			const canvas = document.createElement("canvas")
-			const ctx = canvas.getContext("2d")
+	const transformFileToWebp = (
+		files: File[],
+		getObjectUrl: (file: File) => string,
+		setFile: Dispatch<SetStateAction<string[]>>,
+	) => {
+		for (const file of files) {
+			const image = new Image()
+			image.src = getObjectUrl(file)
+			image.onload = () => {
+				const canvas = document.createElement("canvas")
+				const ctx = canvas.getContext("2d")
 
-			canvas.width = image.width
-			canvas.height = image.height
+				canvas.width = image.width
+				canvas.height = image.height
 
-			ctx?.drawImage(image, 0, 0)
+				ctx?.drawImage(image, 0, 0)
 
-			let test = canvas.toDataURL("image/webp", 0.1)
+				const url = canvas.toDataURL("image/webp", 0.1)
 
-			setFile(test)
+				setFile((prev) => [...prev, url])
+			}
 		}
 	}
 
 	return (
 		<div className="flex flex-col gap-4">
-			<Form method="post">
+			<Form method="post" replace>
 				<h1>Profile</h1>
 				<p>Profile page content</p>
 				<input
@@ -89,12 +95,32 @@ export default function ProfileRoute() {
 					accept="image/*"
 					onChange={(event) => {
 						if (event.target.files?.length) {
-							transformFileToWebp(event.target.files[0])
+							transformFileToWebp(
+								Array.from(event.target.files),
+								getObjectUrl,
+								setFile,
+							)
 						}
 					}}
 				/>
 
-				<input type="hidden" name="profile" value={file} />
+				{file.map((file, idx) => (
+					<div key={idx}>
+						<input value={file} type="hidden" name="profile" />
+
+						<AlbumArtwork
+							contextMenu="false"
+							className="w-[250px]"
+							aspectRatio="portrait"
+							album={{
+								title: "test",
+								artist: "test",
+								cover: file,
+							}}
+						/>
+					</div>
+				))}
+
 				<button type="submit">Submit</button>
 			</Form>
 
