@@ -67,7 +67,7 @@ export default function ProfileRoute() {
 						<input value={file} type="hidden" name="profile" />
 
 						<AlbumArtwork
-							contextMenu="false"
+							hasContextMenu={false}
 							className="w-[250px]"
 							aspectRatio="portrait"
 							album={{

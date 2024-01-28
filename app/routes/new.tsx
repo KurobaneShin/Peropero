@@ -13,7 +13,7 @@ import {
 	useLoaderData,
 	useLocation,
 } from "@remix-run/react"
-import { Suspense, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { z } from "zod"
 import { zfd } from "zod-form-data"
 import { InputWithLabel } from "~/components/custom/inputWithLabel"
@@ -26,14 +26,16 @@ import { makeForm } from "~/lib/makeForm"
 import { AlbumArtwork } from "./_index/components/album"
 import { getUser } from "~/lib/getUser"
 import { Label } from "~/components/ui/label"
+import { transformFileToWebp } from "~/lib/transformFileToWebp"
+import { b64toBlob } from "~/lib/b64toBlob"
 
 const { parse } = makeForm(
 	z.object({
 		title: zfd.text(),
 		authors: z.array(z.string()).or(z.string()),
 		tags: z.array(z.string()).or(z.string()),
-		file: z.array(z.instanceof(Blob)),
-		cover: z.instanceof(Blob),
+		file: z.array(z.string()),
+		cover: z.string(),
 	}),
 )
 
@@ -106,9 +108,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 			return { errors }
 		}
 
-		const uploadPromises = handlePageUploads(data.file)
+		const filesBlobs = data.file.map((file) => b64toBlob(file, "image/webp"))
 
-		const coverUpload = await handleCoverUpload(data.cover)
+		const uploadPromises = handlePageUploads(filesBlobs)
+
+		const coverBlob = b64toBlob(data.cover, "image/webp")
+		const coverUpload = await handleCoverUpload(coverBlob)
 
 		const uploadResults = await Promise.all(uploadPromises)
 
@@ -179,12 +184,19 @@ export default function New() {
 	const { authors, tags } = useLoaderData<typeof loader>()
 	const { pathname } = useLocation()
 
-	const [files, setFiles] = useState<File[]>([])
+	const [files, setFiles] = useState<string[]>([])
 
-	const [cover, setCover] = useState<File>()
+	const [cover, setCover] = useState<string[]>([])
 	const [artists, setArtists] = useState<string[]>([])
 	const [selectedTags, setSelectedTags] = useState<string[]>([])
+
+	const [loadingPages, setLoadingPages] = useState<number>()
 	const getObjectUrl = useObjectUrls()
+
+	useEffect(() => {
+		if (files.length === loadingPages) setLoadingPages(undefined)
+	}, [files])
+
 	return (
 		<Form method="post" action={pathname} encType="multipart/form-data">
 			<InputWithLabel label="Titulo" name="title" />
@@ -243,13 +255,24 @@ export default function New() {
 			<Label>Cover</Label>
 			<Input
 				type="file"
-				name="cover"
 				onChange={(e) => {
-					setCover(e.target.files?.[0])
+					if (e.target.files?.length) {
+						transformFileToWebp(
+							Array.from(e.target.files),
+							getObjectUrl,
+							setCover,
+						)
+					}
 				}}
 			/>
 
-			{cover && (
+			<Button type="button" onClick={() => setCover([])}>
+				Clear
+			</Button>
+
+			<input type="hidden" name="cover" value={cover[0] ?? ""} />
+
+			{cover.length > 0 && (
 				<AlbumArtwork
 					hasContextMenu={false}
 					aspectRatio="portrait"
@@ -257,8 +280,8 @@ export default function New() {
 					width={150}
 					height={150}
 					album={{
-						title: cover.name,
-						cover: getObjectUrl(cover),
+						title: "",
+						cover: cover[0],
 						artist: "",
 					}}
 				/>
@@ -267,32 +290,48 @@ export default function New() {
 			<Label>Pages</Label>
 			<Input
 				type="file"
-				name="file"
 				multiple={true}
 				onChange={(e) => {
-					const files = Array.from(e.target.files || [])
-					setFiles(files)
+					if (e.target.files?.length) {
+						setLoadingPages(e.target.files.length)
+						transformFileToWebp(
+							Array.from(e.target.files),
+							getObjectUrl,
+							setFiles,
+						)
+					}
 				}}
 			/>
 
 			<div className="flex flex-row space-x-4 flex-wrap">
-				{files.map((file: File) => (
-					<AlbumArtwork
-						hasContextMenu={false}
-						key={file.name}
-						aspectRatio="portrait"
-						className="w-[150px]"
-						width={150}
-						height={150}
-						album={{
-							title: file.name,
-							cover: getObjectUrl(file),
-							artist: "",
-						}}
-					/>
+				{loadingPages && <p>Processing {loadingPages} files</p>}
+				{files.map((file: string, idx) => (
+					<div key={idx}>
+						<AlbumArtwork
+							hasContextMenu={false}
+							key={idx}
+							aspectRatio="portrait"
+							className="w-[150px]"
+							width={150}
+							height={150}
+							album={{
+								title: "",
+								cover: file,
+								artist: "",
+							}}
+						/>
+						<input value={file} type="hidden" name="file" />
+					</div>
 				))}
 			</div>
-			<Button type="submit">Submit</Button>
+
+			<Button type="button" onClick={() => setCover([])}>
+				Clear
+			</Button>
+
+			<Button disabled={!!loadingPages} type="submit">
+				Submit
+			</Button>
 		</Form>
 	)
 }
