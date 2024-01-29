@@ -297,10 +297,12 @@ export default function New() {
 				onChange={(e) => {
 					if (e.target.files?.length) {
 						setLoadingPages(e.target.files.length + files.length)
+						const filesArray = Array.from(e.target.files)
 
-						Array.from(e.target.files).forEach((file, idx) =>
-							transformFilesToWebp(file, idx + 1, getObjectUrl, setFiles),
-						)
+						for (let i = 0; i < filesArray.length; i++) {
+							const file = filesArray[i]
+							transformFilesToWebp(file, i + 1, getObjectUrl, setFiles)
+						}
 					}
 				}}
 			/>
