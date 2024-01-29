@@ -30,7 +30,7 @@ export const action = async (args: ActionFunctionArgs) => {
 
 	const { error, data: image } = await superSupabase.storage
 		.from("avatars")
-		.upload("test", blob, {
+		.upload(user, blob, {
 			upsert: true,
 		})
 
