@@ -367,16 +367,19 @@ export interface Database {
       }
       profiles: {
         Row: {
+          avatar: string | null
           email: string
           id: string
           username: string
         }
         Insert: {
+          avatar?: string | null
           email: string
           id: string
           username: string
         }
         Update: {
+          avatar?: string | null
           email?: string
           id?: string
           username?: string

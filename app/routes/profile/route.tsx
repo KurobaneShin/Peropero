@@ -1,4 +1,4 @@
-import { ActionFunctionArgs } from "@remix-run/node"
+import { ActionFunctionArgs, redirect } from "@remix-run/node"
 import { Form } from "@remix-run/react"
 import { Dispatch, SetStateAction, useState } from "react"
 import { z } from "zod"
@@ -8,6 +8,8 @@ import { makeForm } from "~/lib/makeForm"
 import { AlbumArtwork } from "../_index/components/album"
 import { transformFileToWebp } from "~/lib/transformFileToWebp"
 import { b64toBlob } from "~/lib/b64toBlob"
+import { getUser } from "~/lib/getUser"
+import { accessToken } from "~/cookies"
 
 const { parse } = makeForm(
 	z.object({
@@ -16,6 +18,7 @@ const { parse } = makeForm(
 )
 
 export const action = async (args: ActionFunctionArgs) => {
+	const user = await getUser(args.request)
 	const data = parse(await args.request.formData())
 
 	if (data.errors) {
@@ -25,8 +28,8 @@ export const action = async (args: ActionFunctionArgs) => {
 
 	const blob = b64toBlob(data.data.profile, "image/webp")
 
-	const { error } = await superSupabase.storage
-		.from("profiles")
+	const { error, data: image } = await superSupabase.storage
+		.from("avatars")
 		.upload("test", blob, {
 			upsert: true,
 		})
@@ -35,7 +38,26 @@ export const action = async (args: ActionFunctionArgs) => {
 		console.log(error)
 	}
 
-	return {}
+	const { data: profile } = await supabase
+		.from("profiles")
+		.update({
+			avatar: `${process.env.SUPABASE_URL}/storage/v1/object/public/avatars/${image?.path}`,
+		})
+		.eq("id", user)
+		.select("*")
+		.maybeSingle()
+
+	const session = await accessToken.getSession(
+		args.request.headers.get("cookie"),
+	)
+
+	session.set("profile", profile)
+
+	return redirect("/", {
+		headers: {
+			"Set-Cookie": await accessToken.commitSession(session),
+		},
+	})
 }
 
 export default function ProfileRoute() {
@@ -45,9 +67,10 @@ export default function ProfileRoute() {
 
 	return (
 		<div className="flex flex-col gap-4">
-			<Form method="post" replace>
+			<Form method="post">
 				<h1>Profile</h1>
 				<p>Profile page content</p>
+
 				<input
 					type="file"
 					accept="image/*"
@@ -59,32 +82,20 @@ export default function ProfileRoute() {
 				/>
 
 				<input value={file} type="hidden" name="profile" />
-
-				<AlbumArtwork
-					hasContextMenu={false}
-					className="w-[250px]"
-					aspectRatio="portrait"
-					album={{
-						title: "test",
-						artist: "test",
-						cover: file,
-					}}
-				/>
-
+				{file && (
+					<AlbumArtwork
+						hasContextMenu={false}
+						className="w-[250px]"
+						aspectRatio="portrait"
+						album={{
+							title: "test",
+							artist: "test",
+							cover: file,
+						}}
+					/>
+				)}
 				<button type="submit">Submit</button>
 			</Form>
-
-			<AlbumArtwork
-				contextMenu="false"
-				className="w-[250px]"
-				aspectRatio="portrait"
-				album={{
-					title: "test",
-					artist: "test",
-					cover:
-						"http://127.0.0.1:54321/storage/v1/object/public/profiles/test",
-				}}
-			/>
 		</div>
 	)
 }

@@ -80,7 +80,10 @@ function App() {
 					<div className="ml-auto flex items-center space-x-4">
 						<ModeToggle />
 						{data.user ? (
-							<UserAvatar userName={data.user.username} />
+							<UserAvatar
+								userName={data.user.username}
+								avatar={data.user.avatar}
+							/>
 						) : (
 							<Link to="/signin" prefetch="intent">
 								<Button>Sign in</Button>
