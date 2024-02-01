@@ -24,7 +24,7 @@ export const transformFilesToWebp = (
 
 		ctx?.drawImage(image, 0, 0)
 
-		const url = canvas.toDataURL("image/webp", 0.8)
+		const url = canvas.toDataURL("image/webp", 0.1)
 
 		setFile((prev) => [
 			...prev,

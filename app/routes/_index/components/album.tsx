@@ -64,22 +64,18 @@ export function AlbumArtwork({
 							title={album.title}
 							cover={album.cover}
 							pages={pages}>
-							<picture>
-								<img
-									loading="lazy"
-									decoding="async"
-									src={album.cover}
-									alt={album.title}
-									width={width}
-									height={height}
-									className={cn(
-										"h-auto w-auto object-cover transition-all hover:scale-105",
-										aspectRatio === "portrait"
-											? "aspect-[3/4]"
-											: "aspect-square",
-									)}
-								/>
-							</picture>
+							<img
+								loading="lazy"
+								decoding="async"
+								src={album.cover}
+								alt={album.title}
+								width={width}
+								height={height}
+								className={cn(
+									"h-auto w-auto object-cover transition-all hover:scale-105",
+									aspectRatio === "portrait" ? "aspect-[3/4]" : "aspect-square",
+								)}
+							/>
 						</MangaLink>
 					</div>
 				</ContextMenuTrigger>
