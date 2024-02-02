@@ -79,7 +79,7 @@ export default function MangaId() {
 	const { manga: mangPromise } = useLoaderData<typeof loader>()
 	const params = useParams()
 	return (
-		<main className="bg-red-500 px-4 mx-auto py-6">
+		<main className="px-4 mx-auto py-6">
 			<div className="grid lg:grid-cols-[1fr] gap-6 lg:gap-12 items-start">
 				<Card className="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4 h-fit">
 					<Suspense

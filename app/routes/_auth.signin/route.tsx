@@ -96,7 +96,7 @@ export default function SignIn() {
 		captchaRef.current?.execute()
 	}
 	return (
-		<Form method="post">
+		<Form method="post" className="px-4 mx-auto py-6">
 			<Card>
 				<CardHeader className="space-y-1">
 					<CardTitle className="text-2xl">Sign in to your account</CardTitle>

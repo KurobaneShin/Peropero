@@ -8,6 +8,7 @@ import { supabase } from "~/infra/supabase"
 import { makeForm } from "~/lib/makeForm"
 import { useRef, useState } from "react"
 import Hcaptcha from "@hcaptcha/react-hcaptcha"
+import { Card, CardContent } from "~/components/ui/card"
 
 const { parse } = makeForm(
 	z.object({
@@ -80,29 +81,37 @@ export default function Signup() {
 	}
 
 	return (
-		<div className="bg-background  h-screen">
-			<Form method="post" className="flex flex-col gap-4">
-				<InputWithLabel name="name" label="Nome" errors={actionData?.errors} />
-				<InputWithLabel
-					name="email"
-					label="Email"
-					errors={actionData?.errors}
-				/>
-				<InputWithLabel
-					name="password"
-					label="Password"
-					type="password"
-					errors={actionData?.errors}
-				/>
-				<Hcaptcha
-					ref={captchaRef}
-					sitekey={"21327b3d-ef5c-4bb1-abfd-4227f319f9e3"}
-					onVerify={(token) => setCaptchaToken(token)}
-				/>
-				<input type="hidden" name="captchaToken" value={captchaToken} />
+		<Form method="post" className="px-4 mx-auto py-6">
+			<Card>
+				<CardContent className="grid gap-4">
+					<div className="grid gap-2">
+						<InputWithLabel
+							name="name"
+							label="Nome"
+							errors={actionData?.errors}
+						/>
+					</div>
+					<InputWithLabel
+						name="email"
+						label="Email"
+						errors={actionData?.errors}
+					/>
+					<InputWithLabel
+						name="password"
+						label="Password"
+						type="password"
+						errors={actionData?.errors}
+					/>
+					<Hcaptcha
+						ref={captchaRef}
+						sitekey={"21327b3d-ef5c-4bb1-abfd-4227f319f9e3"}
+						onVerify={(token) => setCaptchaToken(token)}
+					/>
+					<input type="hidden" name="captchaToken" value={captchaToken} />
 
-				<Button type="submit">Submit</Button>
-			</Form>
-		</div>
+					<Button type="submit">Submit</Button>
+				</CardContent>
+			</Card>
+		</Form>
 	)
 }
