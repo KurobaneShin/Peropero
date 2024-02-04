@@ -13,7 +13,6 @@ import {
 import { useEffect, useState } from "react"
 import { z } from "zod"
 import { FormControl } from "~/components/custom/FormControl"
-import Page from "~/components/custom/Page"
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
@@ -23,7 +22,6 @@ import {
 	SheetContent,
 	SheetFooter,
 	SheetHeader,
-	SheetTrigger,
 } from "~/components/ui/sheet"
 import { supabase } from "~/infra/supabase"
 import { getUser } from "~/lib/getUser"

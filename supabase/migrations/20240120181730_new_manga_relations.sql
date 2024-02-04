@@ -28,7 +28,7 @@ create table languages (
 
 create table mangas_languages (
   manga integer not null references mangas(id),
-  language integer not null references parodies(id)
+  language integer not null references languages(id)
 );
 
 create table characters (
