@@ -12,6 +12,7 @@ import {
 	Link,
 	useLoaderData,
 	useLocation,
+	useNavigation,
 } from "@remix-run/react"
 import React, { Suspense, useEffect, useState } from "react"
 import { z } from "zod"
@@ -194,6 +195,9 @@ export default function New() {
 	const [loadingPages, setLoadingPages] = useState<number>()
 	const getObjectUrl = useObjectUrls()
 
+	const transition = useNavigation()
+	const isSubmitting = transition.state === "submitting"
+
 	useEffect(() => {
 		if (files.length === loadingPages) setLoadingPages(undefined)
 	}, [files, loadingPages])
@@ -344,7 +348,7 @@ export default function New() {
 				</div>
 			</div>
 
-			<Button disabled={!!loadingPages} type="submit">
+			<Button disabled={!!loadingPages || isSubmitting} type="submit">
 				Submit
 			</Button>
 		</Form>
