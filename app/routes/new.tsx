@@ -10,6 +10,7 @@ import {
 	ClientLoaderFunctionArgs,
 	Form,
 	Link,
+	useActionData,
 	useLoaderData,
 	useLocation,
 	useNavigation,
@@ -30,6 +31,9 @@ import { Label } from "~/components/ui/label"
 import { transformFileToWebp } from "~/lib/transformFileToWebp"
 import { transformFilesToWebp } from "~/lib/transFilesToWebp"
 import { b64toBlob } from "~/lib/b64toBlob"
+import Page from "~/components/custom/Page"
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
+import { FormControl } from "~/components/custom/FormControl"
 
 const { parse } = makeForm(
 	z.object({
@@ -201,7 +205,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 		return redirect(`/mangas/${newManga?.[0]?.id}`)
 	} catch (e) {
-		return e
+		return { errors: { trueError: JSON.stringify(e) } }
 	}
 }
 
@@ -215,8 +219,8 @@ export const clientAction = async ({
 
 export default function New() {
 	const { authors, tags, groups } = useLoaderData<typeof loader>()
+	const actionData = useActionData<typeof action>()
 	const { pathname } = useLocation()
-	console.log(groups)
 
 	const [files, setFiles] = useState<{ page: number; url: string }[]>([])
 
@@ -248,167 +252,200 @@ export default function New() {
 	}
 
 	return (
-		<Form method="post" action={pathname} encType="multipart/form-data">
-			<InputWithLabel label="Titulo" name="title" />
+		<Page>
+			<Card>
+				<CardHeader className="space-y-1">
+					<CardTitle className="text-2xl">New Manga</CardTitle>
+				</CardHeader>
+				<CardContent>
+					<Form
+						method="post"
+						action={pathname}
+						encType="multipart/form-data"
+						className="grid gap-4">
+						<FormControl name="title" label="Title" errors={actionData?.errors}>
+							<Input id="title" name="title" type="text" />
+						</FormControl>
 
-			<Label>Authors</Label>
-
-			<Suspense fallback={<div>Loading...</div>}>
-				<Await resolve={authors}>
-					{(authorsList) => (
-						<Combobox
-							options={authorsList}
-							clearable={true}
-							value={artists}
-							multiple={true}
-							onValueChange={(v) => {
-								setArtists(v)
-							}}
-						/>
-					)}
-				</Await>
-			</Suspense>
-
-			{artists.map((artist) => (
-				<input key={artist} type="hidden" name="authors" value={artist} />
-			))}
-
-			<p className="text-sm text-muted-foreground">
-				Arthist no found? <Link to="/authors/new">click here!</Link> to add
-			</p>
-			<Label>Tags</Label>
-
-			<Suspense fallback={<div>Loading...</div>}>
-				<Await resolve={tags}>
-					{(tagsList) => (
-						<Combobox
-							options={tagsList}
-							clearable={true}
-							value={selectedTags}
-							multiple={true}
-							onValueChange={(v) => {
-								setSelectedTags(v)
-							}}
-						/>
-					)}
-				</Await>
-			</Suspense>
-
-			{selectedTags.map((tag) => (
-				<input key={tag} type="hidden" name="tags" value={tag} />
-			))}
-
-			<p className="text-sm text-muted-foreground">
-				Tag no found? <Link to="/tags/new">click here!</Link> to add
-			</p>
-
-			<Label>Groups</Label>
-			<Suspense fallback={<div>Loading...</div>}>
-				<Await resolve={groups}>
-					{(groupsList) => (
-						<Combobox
-							options={groupsList}
-							clearable={true}
-							value={selectedGroups}
-							multiple={true}
-							onValueChange={(v) => {
-								setSelectedGroups(v)
-							}}
-						/>
-					)}
-				</Await>
-			</Suspense>
-
-			{selectedGroups.map((group) => (
-				<input key={group} type="hidden" name="groups" value={group} />
-			))}
-
-			<p className="text-sm text-muted-foreground">
-				Tag no found? <Link to="/tags/new">click here!</Link> to add
-			</p>
-
-			<Label>Cover</Label>
-			<Input
-				type="file"
-				onChange={(e) => {
-					if (e.target.files?.length) {
-						transformFileToWebp(e.target.files[0], getObjectUrl, setCover)
-					}
-				}}
-			/>
-
-			<div className="flex flex-row space-x-4 flex-wrap">
-				{cover.length > 0 && (
-					<>
-						<Button type="button" onClick={() => setCover("")}>
-							Clear
-						</Button>
-
-						<input type="hidden" name="cover" value={cover ?? ""} />
-						<AlbumArtwork
-							hasContextMenu={false}
-							aspectRatio="portrait"
-							className="w-[150px]"
-							width={150}
-							height={150}
-							album={{
-								title: "",
-								cover: cover,
-								artist: "",
-							}}
-						/>
-					</>
-				)}
-			</div>
-
-			<Label>Pages</Label>
-			<Input
-				type="file"
-				multiple={true}
-				onClick={() => {
-					setFiles([])
-				}}
-				onChange={processPages}
-			/>
-
-			<div className="flex flex-row space-x-4 ">
-				{loadingPages && <p>Processing {loadingPages} files</p>}
-				{files.length > 0 && (
-					<Button type="button" onClick={() => setFiles([])}>
-						Clear
-					</Button>
-				)}
-
-				<div className="grid grid-cols-6 gap-4">
-					{files
-						.sort((a, b) => a.page - b.page)
-						.map((file) => (
-							<div key={file.page}>
-								<AlbumArtwork
-									hasContextMenu={false}
-									key={file.page}
-									aspectRatio="portrait"
-									className="w-[150px]"
-									width={150}
-									height={150}
-									album={{
-										title: file.page.toString(),
-										cover: file.url,
-										artist: "",
-									}}
+						<FormControl
+							name="authors"
+							label="Authors"
+							errors={actionData?.errors}>
+							<Suspense fallback={<div>Loading...</div>}>
+								<Await resolve={authors}>
+									{(authorsList) => (
+										<Combobox
+											options={authorsList}
+											clearable={true}
+											value={artists}
+											multiple={true}
+											onValueChange={(v) => {
+												setArtists(v)
+											}}
+										/>
+									)}
+								</Await>
+							</Suspense>
+							<p className="text-sm text-muted-foreground">
+								Arthist no found? <Link to="/authors/new">click here!</Link> to
+								add
+							</p>
+							{artists.map((artist) => (
+								<input
+									key={artist}
+									type="hidden"
+									name="authors"
+									value={artist}
 								/>
-								<div>
-									<p>{file.page}</p>
-								</div>
-								<input value={file.url} type="hidden" name="file" />
-							</div>
-						))}
-				</div>
-			</div>
+							))}
+						</FormControl>
 
-			<Button disabled={!!loadingPages || isSubmitting} type="submit">
-				Submit
-			</Button>
-		</Form>
+						<FormControl name="tags" label="Tags" errors={actionData?.errors}>
+							<Suspense fallback={<div>Loading...</div>}>
+								<Await resolve={tags}>
+									{(tagsList) => (
+										<Combobox
+											options={tagsList}
+											clearable={true}
+											value={selectedTags}
+											multiple={true}
+											onValueChange={(v) => {
+												setSelectedTags(v)
+											}}
+										/>
+									)}
+								</Await>
+							</Suspense>
+
+							{selectedTags.map((tag) => (
+								<input key={tag} type="hidden" name="tags" value={tag} />
+							))}
+
+							<p className="text-sm text-muted-foreground">
+								Tag no found? <Link to="/tags/new">click here!</Link> to add
+							</p>
+						</FormControl>
+
+						<FormControl
+							name="groups"
+							label="Groups"
+							errors={actionData?.errors}>
+							<Suspense fallback={<div>Loading...</div>}>
+								<Await resolve={groups}>
+									{(groupsList) => (
+										<Combobox
+											options={groupsList}
+											clearable={true}
+											value={selectedGroups}
+											multiple={true}
+											onValueChange={(v) => {
+												setSelectedGroups(v)
+											}}
+										/>
+									)}
+								</Await>
+							</Suspense>
+
+							{selectedGroups.map((group) => (
+								<input key={group} type="hidden" name="groups" value={group} />
+							))}
+
+							<p className="text-sm text-muted-foreground">
+								Tag no found? <Link to="/tags/new">click here!</Link> to add
+							</p>
+						</FormControl>
+
+						<FormControl name="cover" label="Cover" errors={actionData?.errors}>
+							<Input
+								type="file"
+								onChange={(e) => {
+									if (e.target.files?.length) {
+										transformFileToWebp(
+											e.target.files[0],
+											getObjectUrl,
+											setCover,
+										)
+									}
+								}}
+							/>
+						</FormControl>
+
+						<div className="flex flex-row space-x-4 flex-wrap">
+							{cover.length > 0 && (
+								<>
+									<Button type="button" onClick={() => setCover("")}>
+										Clear
+									</Button>
+
+									<input type="hidden" name="cover" value={cover ?? ""} />
+									<AlbumArtwork
+										hasContextMenu={false}
+										aspectRatio="portrait"
+										className="w-[150px]"
+										width={150}
+										height={150}
+										album={{
+											title: "",
+											cover: cover,
+											artist: "",
+										}}
+									/>
+								</>
+							)}
+						</div>
+
+						<FormControl name="file" label="Pages" errors={actionData?.errors}>
+							<Input
+								type="file"
+								multiple={true}
+								onClick={() => {
+									setFiles([])
+								}}
+								onChange={processPages}
+							/>
+						</FormControl>
+
+						<div className="flex flex-row space-x-4 ">
+							{loadingPages && <p>Processing {loadingPages} files</p>}
+							{files.length > 0 && (
+								<Button type="button" onClick={() => setFiles([])}>
+									Clear
+								</Button>
+							)}
+
+							<div className="grid grid-cols-6 gap-4">
+								{files
+									.sort((a, b) => a.page - b.page)
+									.map((file) => (
+										<div key={file.page}>
+											<AlbumArtwork
+												hasContextMenu={false}
+												key={file.page}
+												aspectRatio="portrait"
+												className="w-[150px]"
+												width={150}
+												height={150}
+												album={{
+													title: file.page.toString(),
+													cover: file.url,
+													artist: "",
+												}}
+											/>
+											<div>
+												<p>{file.page}</p>
+											</div>
+											<input value={file.url} type="hidden" name="file" />
+										</div>
+									))}
+							</div>
+						</div>
+
+						<Button disabled={!!loadingPages || isSubmitting} type="submit">
+							Submit
+						</Button>
+					</Form>
+				</CardContent>
+			</Card>
+		</Page>
 	)
 }

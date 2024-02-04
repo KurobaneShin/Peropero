@@ -69,15 +69,14 @@ export default function New() {
 	const navigate = useNavigate()
 	const actionData = useActionData<typeof action>()
 	const isSubmitting = transition.state === "submitting"
+
 	const [isOpen, setIsOpen] = useState(false)
 
-	const handleClose = () => {
-		navigate("/groups")
-	}
+	const handleClose = () => navigate("/groups")
 
-	useEffect(() => {
-		setIsOpen(true)
-	}, [])
+	const openSheet = () => setIsOpen(true)
+
+	useEffect(openSheet, [])
 
 	return (
 		<Sheet open={isOpen}>
