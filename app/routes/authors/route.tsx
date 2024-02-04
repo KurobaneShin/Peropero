@@ -1,4 +1,15 @@
 import { Link, Outlet, useLoaderData, useLocation } from "@remix-run/react"
+import Page from "~/components/custom/Page"
+import { Button } from "~/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "~/components/ui/table"
 import { supabase } from "~/infra/supabase"
 
 export const loader = async () => {
@@ -18,34 +29,42 @@ export default function Authors() {
 	const { pathname } = useLocation()
 
 	return (
-		<div>
-			<div className="flex items-center justify-between">
-				<h1>Authors</h1>
-				{!pathname.includes("new") && (
-					<div>
-						<Link to="new">Add</Link>
+		<Page>
+			<Card>
+				<CardHeader className="space-y-1">
+					<div className="flex items-center justify-between">
+						<CardTitle className="text-2xl">Authors</CardTitle>
+						{!pathname.includes("new") && (
+							<Link to="new">
+								<Button>New Author</Button>
+							</Link>
+						)}
 					</div>
-				)}
-			</div>
+				</CardHeader>
+				<CardContent>
+					<Table>
+						<TableHeader>
+							<TableRow>
+								<TableHead className="w-[100px]">Name</TableHead>
+								<TableHead>Mangas</TableHead>
+							</TableRow>
+						</TableHeader>
+						<TableBody>
+							{authors.map((author) => (
+								<TableRow key={author.id}>
+									<TableCell>{author.name}</TableCell>
+									<TableCell>{author.mangas_authors.length}</TableCell>
+									<TableCell className="text-right">
+										<Link to={`/author/${author.id}`}>Visit</Link>
+									</TableCell>
+								</TableRow>
+							))}
+						</TableBody>
+					</Table>
+				</CardContent>
+			</Card>
 
 			<Outlet />
-
-			<table className="mt-4">
-				<thead>
-					<tr>
-						<th>Nome</th>
-						<th>Obras</th>
-					</tr>
-				</thead>
-				<tbody>
-					{authors.map((author) => (
-						<tr key={author.id}>
-							<td>{author.name}</td>
-							<td>{author.mangas_authors.length}</td>
-						</tr>
-					))}
-				</tbody>
-			</table>
-		</div>
+		</Page>
 	)
 }
