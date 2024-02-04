@@ -36,7 +36,7 @@ export default function Languages() {
 						<CardTitle className="text-2xl">Languages</CardTitle>
 						{!pathname.includes("new") && (
 							<Link to="new">
-								<Button>New Character</Button>
+								<Button>New Language</Button>
 							</Link>
 						)}
 					</div>
