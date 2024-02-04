@@ -42,8 +42,6 @@ export default function Groups() {
 					</div>
 				</CardHeader>
 				<CardContent>
-					<Outlet />
-
 					<Table>
 						<TableHeader>
 							<TableRow>
@@ -65,6 +63,8 @@ export default function Groups() {
 					</Table>
 				</CardContent>
 			</Card>
+
+			<Outlet />
 		</Page>
 	)
 }

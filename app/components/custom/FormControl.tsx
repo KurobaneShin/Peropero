@@ -9,6 +9,7 @@ interface FormControlProps {
 	errorIcon?: React.ReactNode | React.ReactNode[]
 	helperText?: string
 	tag?: React.ReactNode
+	className?: string
 }
 
 export const FormControl = ({
@@ -18,11 +19,12 @@ export const FormControl = ({
 	label,
 	helperText,
 	tag,
+	className,
 }: FormControlProps) => {
 	const hasError = errors && name in errors
 
 	return (
-		<div aria-invalid={hasError}>
+		<div aria-invalid={hasError} className={className}>
 			<div className="flex w-full items-center justify-between">
 				{label && <Label htmlFor={name}>{label}</Label>}
 				{tag && tag}
@@ -31,8 +33,7 @@ export const FormControl = ({
 			{hasError ? (
 				<small
 					className="text-sm font-medium leading-none text-red-500"
-					data-cy={`error-${name}`}
-				>
+					data-cy={`error-${name}`}>
 					{typeof errors[name] === "string" ? errors[name] : errors[name][0]}
 				</small>
 			) : helperText ? (
