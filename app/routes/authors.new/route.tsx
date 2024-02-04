@@ -70,7 +70,7 @@ export default function New() {
 
 	const [isOpen, setIsOpen] = useState(false)
 
-	const handleClose = () => navigate("/groups")
+	const handleClose = () => navigate("/authors")
 
 	const openSheet = () => setIsOpen(true)
 
