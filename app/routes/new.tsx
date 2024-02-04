@@ -36,6 +36,7 @@ const { parse } = makeForm(
 		title: zfd.text(),
 		authors: z.array(z.string()).or(z.string()),
 		tags: z.array(z.string()).or(z.string()),
+		groups: z.array(z.string()).or(z.string()),
 		file: z.array(z.string()),
 		cover: z.string(),
 	}),
@@ -64,7 +65,22 @@ export const loader = async (args: LoaderFunctionArgs) => {
 		)
 	}
 
-	return defer({ authors: authorsPromise(), tags: tagsPromise() })
+	const groupPromise = async () => {
+		const data = await supabase.from("groups").select("*")
+
+		return (
+			data.data?.map((group) => ({
+				value: group.id.toString(),
+				label: group.title,
+			})) || []
+		)
+	}
+
+	return defer({
+		authors: authorsPromise(),
+		tags: tagsPromise(),
+		groups: groupPromise(),
+	})
 }
 
 export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
@@ -77,9 +93,10 @@ export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
 
 	const tags = await loaderData.tags
 	const authors = await loaderData.authors
+	const groups = await loaderData.groups
 
-	sessionStorage.setItem(cacheKey, JSON.stringify({ tags, authors }))
-	return { tags, authors }
+	sessionStorage.setItem(cacheKey, JSON.stringify({ tags, authors, groups }))
+	return { tags, authors, groups }
 }
 
 clientLoader.hydrate = true
@@ -145,6 +162,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 		const tagsToInsert = Array.isArray(data.tags) ? data.tags : [data.tags]
 
+		const groupsToInsert = Array.isArray(data.groups)
+			? data.groups
+			: [data.groups]
+
 		const authorsInsert = authorsToInsert.map((author) => ({
 			manga: newManga?.[0]?.id as number,
 			author: Number(author),
@@ -155,6 +176,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 			tag: Number(tag),
 		}))
 
+		const groupsInsert = groupsToInsert.map((group) => ({
+			manga: newManga?.[0]?.id,
+			groupid: Number(group),
+		}))
+
 		const authorsInsertPromise = authorsInsert.map((author) =>
 			supabase.from("mangas_authors").insert(author),
 		)
@@ -162,10 +188,15 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 			supabase.from("mangas_tags").insert(tag),
 		)
 
+		const groupsInsertPromise = groupsInsert.map((group) =>
+			supabase.from("mangas_groups").insert(group),
+		)
+
 		await Promise.all([
 			...authorsInsertPromise,
 			...tagsInsertPromise,
 			...pagesInsert,
+			...groupsInsertPromise,
 		])
 
 		return redirect(`/mangas/${newManga?.[0]?.id}`)
@@ -183,14 +214,16 @@ export const clientAction = async ({
 }
 
 export default function New() {
-	const { authors, tags } = useLoaderData<typeof loader>()
+	const { authors, tags, groups } = useLoaderData<typeof loader>()
 	const { pathname } = useLocation()
+	console.log(groups)
 
 	const [files, setFiles] = useState<{ page: number; url: string }[]>([])
 
 	const [cover, setCover] = useState<string>("")
 	const [artists, setArtists] = useState<string[]>([])
 	const [selectedTags, setSelectedTags] = useState<string[]>([])
+	const [selectedGroups, setSelectedGroups] = useState<string[]>([])
 
 	const [loadingPages, setLoadingPages] = useState<number>()
 	const getObjectUrl = useObjectUrls()
@@ -263,6 +296,31 @@ export default function New() {
 
 			{selectedTags.map((tag) => (
 				<input key={tag} type="hidden" name="tags" value={tag} />
+			))}
+
+			<p className="text-sm text-muted-foreground">
+				Tag no found? <Link to="/tags/new">click here!</Link> to add
+			</p>
+
+			<Label>Groups</Label>
+			<Suspense fallback={<div>Loading...</div>}>
+				<Await resolve={groups}>
+					{(groupsList) => (
+						<Combobox
+							options={groupsList}
+							clearable={true}
+							value={selectedGroups}
+							multiple={true}
+							onValueChange={(v) => {
+								setSelectedGroups(v)
+							}}
+						/>
+					)}
+				</Await>
+			</Suspense>
+
+			{selectedGroups.map((group) => (
+				<input key={group} type="hidden" name="groups" value={group} />
 			))}
 
 			<p className="text-sm text-muted-foreground">
