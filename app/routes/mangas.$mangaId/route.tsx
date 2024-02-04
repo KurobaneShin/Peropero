@@ -128,9 +128,13 @@ export default function MangaId() {
 										</nav>
 										<h2 className="text-xl font-bold">Groups</h2>
 										<nav className="flex gap-1">
-											<Badge className="text-sm font-medium">Group 1</Badge>
-											<Badge className="text-sm font-medium">Group 2</Badge>
-											<Badge className="text-sm font-medium">Group 3</Badge>
+											{manga.mangas_groups.map((mg) => (
+												<Badge
+													key={mg.groups?.id}
+													className="text-sm font-medium">
+													{mg.groups?.title}
+												</Badge>
+											))}
 										</nav>
 										<h2 className="text-xl font-bold">Languages</h2>
 										<nav className="flex gap-1">
