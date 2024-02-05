@@ -39,7 +39,6 @@ export function AlbumArtwork({
 			<div className={cn("space-y-3", className)} {...props}>
 				<div className="overflow-hidden rounded-md">
 					<img
-						loading="lazy"
 						src={album.cover}
 						alt={album.title}
 						width={width}
@@ -65,8 +64,6 @@ export function AlbumArtwork({
 							cover={album.cover}
 							pages={pages}>
 							<img
-								loading="lazy"
-								decoding="async"
 								src={album.cover}
 								alt={album.title}
 								width={width}
