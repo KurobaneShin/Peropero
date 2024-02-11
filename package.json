@@ -10,6 +10,9 @@
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "cross-env NODE_ENV=production node ./server.mjs",
     "typecheck": "tsc",
+    "build-cloudflare-pages": "bash misc/cloudflare-pages/build.sh",
+    "preview-cloudflare-pages": "wrangler pages dev ./misc/cloudflare-pages/build/client --compatibility-date=2023-04-20",
+    "release-cloudflare-pages": "wrangler pages deploy ./misc/cloudflare-pages/build/client --commit-dirty --branch main --project-name remix-vite-deploy-pages",
     "build-vercel-edge": "bash misc/vercel-edge/build.sh",
     "release-vercel-edge": "vercel deploy --prebuilt misc/vercel-edge --prod",
     "build-vercel-serverless": "bash misc/vercel-serverless/build.sh",
@@ -55,6 +58,7 @@
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.8.9",
     "vite-plugin-commonjs": "^0.10.1",
+    "wrangler": "^3.26.0",
     "zod": "^3.22.4",
     "zod-form-data": "^2.0.2"
   },

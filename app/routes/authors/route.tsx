@@ -55,7 +55,7 @@ export default function Authors() {
 									<TableCell>{author.name}</TableCell>
 									<TableCell>{author.mangas_authors.length}</TableCell>
 									<TableCell className="text-right">
-										<Link to={`/author/${author.id}`}>Visit</Link>
+										<Link to={`${author.id}`}>Visit</Link>
 									</TableCell>
 								</TableRow>
 							))}
