@@ -11,8 +11,7 @@ import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader } from "~/components/ui/card"
 import { Skeleton } from "~/components/ui/skeleton"
-import { supabase } from "~/infra/supabase"
-import { getMangaDetails } from "~/repositories/supabase/mangas"
+import { getMangaDetails, getMangaTitle } from "~/repositories/supabase"
 
 export const loader = async (args: LoaderFunctionArgs) => {
 	const { mangaId } = args.params
@@ -21,15 +20,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
 		throw new Error("Manga id is required")
 	}
 
-	const { data, error } = await supabase
-		.from("mangas")
-		.select("title")
-		.eq("id", Number(mangaId))
-		.maybeSingle()
-
-	if (!data || error) {
-		throw new Error("Manga not found")
-	}
+	const data = await getMangaTitle(mangaId)
 
 	return defer(
 		{ manga: getMangaDetails(mangaId), title: data.title },

@@ -59,3 +59,17 @@ export const getNewestMangas = async () => {
 	}
 	return data
 }
+
+export const getMangaTitle = async (mangaId: string) => {
+	const { data, error } = await supabase
+		.from("mangas")
+		.select("title")
+		.eq("id", Number(mangaId))
+		.maybeSingle()
+
+	if (!data || error) {
+		throw new Error("Manga not found")
+	}
+
+	return data
+}

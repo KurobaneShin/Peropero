@@ -7,7 +7,6 @@ import {
 } from "@remix-run/react"
 import { Suspense } from "react"
 import { Skeleton } from "~/components/ui/skeleton"
-import { supabase } from "~/infra/supabase"
 
 import {
 	Pagination,
@@ -17,7 +16,11 @@ import {
 import { Button } from "~/components/ui/button"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { PageLink } from "./PageLink"
-import { getMangaDetails } from "~/repositories/supabase"
+import {
+	getMangaDetails,
+	getMangaTitle,
+	getPage,
+} from "~/repositories/supabase"
 
 export const loader = async (args: LoaderFunctionArgs) => {
 	const { mangaId, page } = args.params
@@ -26,35 +29,17 @@ export const loader = async (args: LoaderFunctionArgs) => {
 		throw new Error("Manga id and page is required")
 	}
 
-	const { data, error } = await supabase
-		.from("mangas")
-		.select("title")
-		.eq("id", Number(mangaId))
-		.maybeSingle()
+	const pagePromise = getPage({
+		page,
+		mangaId,
+	})
 
-	if (!data || error) {
-		throw new Error("Manga not found")
-	}
-
-	const getPage = async () => {
-		const { data, error } = await supabase
-			.from("pages")
-			.select("*")
-			.eq("manga", Number(mangaId))
-			.eq("page", Number(page))
-			.maybeSingle()
-
-		if (error) {
-			throw error
-		}
-
-		return data
-	}
+	const data = await getMangaTitle(mangaId)
 
 	return defer(
 		{
 			title: data.title,
-			page: getPage(),
+			page: pagePromise,
 			manga: getMangaDetails(mangaId),
 		},
 		{
