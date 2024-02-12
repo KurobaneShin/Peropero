@@ -23,15 +23,18 @@ export const getPage = async ({
 
 export const insertPages = async ({
 	mangaId,
-	images,
+	pageData,
 }: {
 	mangaId: string | number
-	images: string[]
+	pageData: {
+		page: string | number
+		url: string
+	}[]
 }) => {
-	const pagesInsert = images.map((page, idx) => ({
-		page: idx + 1,
+	const pagesInsert = pageData.map((page) => ({
+		page: Number(page.page),
 		manga: Number(mangaId),
-		image: `${process.env.SUPABASE_URL}/storage/v1/object/public/pages/${page}`,
+		image: `${process.env.SUPABASE_URL}/storage/v1/object/public/pages/${page.url}`,
 	}))
 
 	const { data, error } = await supabase.from("pages").insert(pagesInsert)

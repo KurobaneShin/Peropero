@@ -26,14 +26,16 @@ import { supabase } from "~/infra/supabase"
 import { makeForm } from "~/lib/makeForm"
 import { AlbumArtwork } from "./_index/components/album"
 import { getUser } from "~/lib/getUser"
+import { b64toBlob } from "~/lib/b64toBlob"
 import { transformFileToWebp } from "~/lib/transformFileToWebp"
 import { transformFilesToWebp } from "~/lib/transFilesToWebp"
-import { b64toBlob } from "~/lib/b64toBlob"
 import Page from "~/components/custom/Page"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { FormControl } from "~/components/custom/FormControl"
 import {
 	createManga,
+	handleCoverUpload,
+	handlePageUploads,
 	insertMangaAuthors,
 	insertMangaTags,
 	insertPages,
@@ -46,7 +48,12 @@ const { parse } = makeForm(
 		authors: z.array(z.string()).or(z.string()),
 		tags: z.array(z.string()).or(z.string()),
 		groups: z.array(z.string()).or(z.string()),
-		file: z.array(z.string()),
+		file: z.array(
+			z.object({
+				page: z.string(),
+				url: z.string(),
+			}),
+		),
 		cover: z.string(),
 	}),
 )
@@ -112,30 +119,6 @@ export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
 
 clientLoader.hydrate = true
 
-function handlePageUploads(files: Blob[]) {
-	return files.map(async (file) =>
-		supabase.storage
-			.from("pages")
-			.upload(`pages-${Math.random().toString(36).substring(7)}`, file)
-			.then((res) => {
-				if (res.error) throw res.error
-				return res.data.path
-			}),
-	)
-}
-
-async function handleCoverUpload(file: Blob) {
-	const { data, error } = await supabase.storage
-		.from("covers")
-		.upload(`covers-${Math.random().toString(36).substring(7)}`, file)
-
-	if (error) {
-		throw error
-	}
-
-	return data.path
-}
-
 export const action = async ({ request }: ActionFunctionArgs) => {
 	try {
 		const { data, errors } = parse(await request.formData())
@@ -144,15 +127,26 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 			return { errors }
 		}
 
-		const filesBlobs = data.file.map((file) => b64toBlob(file, "image/webp"))
+		const handlePagesb64ToBlob = async (
+			pages: { page: number | string; url: string }[],
+		) => {
+			const promises = pages.map(async (page) => {
+				const blob = await b64toBlob(page.url, "image/webp")
+				return { page: page.page, file: blob }
+			})
 
-		const uploadPromises = handlePageUploads(filesBlobs)
+			const blobs = await Promise.all(promises)
+			return blobs
+		}
 
-		const coverBlob = b64toBlob(data.cover, "image/webp")
+		const filesBlobs = await handlePagesb64ToBlob(data.file)
 
-		const coverUpload = await handleCoverUpload(coverBlob)
+		const coverBlob = await b64toBlob(data.cover, "image/webp")
 
-		const uploadResults = await Promise.all(uploadPromises)
+		const [uploadResults, coverUpload] = await Promise.all([
+			handlePageUploads(filesBlobs),
+			handleCoverUpload(coverBlob),
+		])
 
 		const newManga = await createManga({
 			coverUpload,
@@ -161,7 +155,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 		const pagesInsertPromise = insertPages({
 			mangaId: newManga.id,
-			images: uploadResults,
+			pageData: uploadResults,
 		})
 
 		const groupsInsertPromise = insertMangaGroups({
@@ -188,7 +182,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 		return redirect(`/mangas/${newManga.id}`)
 	} catch (e) {
-		return { errors: { trueError: JSON.stringify(e) } }
+		return { errors: { trueError: JSON.stringify((e as any).message) } }
 	}
 }
 
@@ -203,6 +197,9 @@ export const clientAction = async ({
 export default function New() {
 	const { authors, tags, groups } = useLoaderData<typeof loader>()
 	const actionData = useActionData<typeof action>()
+
+	console.log(actionData)
+
 	const { pathname } = useLocation()
 
 	const [files, setFiles] = useState<{ page: number; url: string }[]>([])
@@ -399,7 +396,7 @@ export default function New() {
 							<div className="grid grid-cols-6 gap-4">
 								{files
 									.sort((a, b) => a.page - b.page)
-									.map((file) => (
+									.map((file, idx) => (
 										<div key={file.page}>
 											<AlbumArtwork
 												hasContextMenu={false}
@@ -417,7 +414,16 @@ export default function New() {
 											<div>
 												<p>{file.page}</p>
 											</div>
-											<input value={file.url} type="hidden" name="file" />
+											<input
+												value={file.url}
+												type="hidden"
+												name={`file[${idx}][url]`}
+											/>
+											<input
+												value={file.page}
+												type="hidden"
+												name={`file[${idx}][page]`}
+											/>
 										</div>
 									))}
 							</div>
