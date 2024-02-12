@@ -73,3 +73,26 @@ export const getMangaTitle = async (mangaId: string) => {
 
 	return data
 }
+
+export const createManga = async ({
+	title,
+	coverUpload,
+}: {
+	title: string
+	coverUpload: string
+}) => {
+	const { data: newManga, error: mangaError } = await supabase
+		.from("mangas")
+		.insert({
+			title,
+			cover: `${process.env.SUPABASE_URL}/storage/v1/object/public/covers/${coverUpload}`,
+		})
+		.select()
+		.maybeSingle()
+
+	if (mangaError || !newManga) {
+		throw mangaError
+	}
+
+	return newManga
+}

@@ -23,9 +23,9 @@ import {
 	SheetFooter,
 	SheetHeader,
 } from "~/components/ui/sheet"
-import { supabase } from "~/infra/supabase"
 import { getUser } from "~/lib/getUser"
 import { makeForm } from "~/lib/makeForm"
+import { createAuthor } from "~/repositories/supabase"
 
 const { parse } = makeForm(
 	z.object({
@@ -48,9 +48,8 @@ export const action = async (args: ActionFunctionArgs) => {
 
 	const { name } = data
 
-	await supabase.from("authors").insert({
-		name,
-	})
+	await createAuthor(name)
+
 	return redirect("/new")
 }
 

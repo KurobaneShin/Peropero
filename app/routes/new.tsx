@@ -32,6 +32,13 @@ import { b64toBlob } from "~/lib/b64toBlob"
 import Page from "~/components/custom/Page"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { FormControl } from "~/components/custom/FormControl"
+import {
+	createManga,
+	insertMangaAuthors,
+	insertMangaTags,
+	insertPages,
+} from "~/repositories/supabase"
+import { insertMangaGroups } from "~/repositories/supabase/groups"
 
 const { parse } = makeForm(
 	z.object({
@@ -46,6 +53,7 @@ const { parse } = makeForm(
 
 export const loader = async (args: LoaderFunctionArgs) => {
 	await getUser(args.request)
+
 	const authorsPromise = async () => {
 		const data = await supabase.from("authors").select("*")
 
@@ -56,6 +64,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
 			})) || []
 		)
 	}
+
 	const tagsPromise = async () => {
 		const data = await supabase.from("tags").select("*")
 
@@ -109,22 +118,28 @@ function handlePageUploads(files: Blob[]) {
 			.from("pages")
 			.upload(`pages-${Math.random().toString(36).substring(7)}`, file)
 			.then((res) => {
-				return res.data?.path
-			})
-			.catch((e) => console.log(e)),
+				if (res.error) throw res.error
+				return res.data.path
+			}),
 	)
 }
 
 async function handleCoverUpload(file: Blob) {
-	return supabase.storage
+	const { data, error } = await supabase.storage
 		.from("covers")
 		.upload(`covers-${Math.random().toString(36).substring(7)}`, file)
-		.then((res) => res.data?.path)
+
+	if (error) {
+		throw error
+	}
+
+	return data.path
 }
 
 export const action = async ({ request }: ActionFunctionArgs) => {
 	try {
 		const { data, errors } = parse(await request.formData())
+
 		if (errors) {
 			return { errors }
 		}
@@ -134,74 +149,44 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 		const uploadPromises = handlePageUploads(filesBlobs)
 
 		const coverBlob = b64toBlob(data.cover, "image/webp")
+
 		const coverUpload = await handleCoverUpload(coverBlob)
 
 		const uploadResults = await Promise.all(uploadPromises)
 
-		const { data: newManga, error: mangaError } = await supabase
-			.from("mangas")
-			.insert({
-				title: data.title,
-				cover: `${process.env.SUPABASE_URL}/storage/v1/object/public/covers/${coverUpload}`,
-			})
-			.select()
+		const newManga = await createManga({
+			coverUpload,
+			title: data.title,
+		})
 
-		if (mangaError) {
-			return { errors: mangaError }
-		}
+		const pagesInsertPromise = insertPages({
+			mangaId: newManga.id,
+			images: uploadResults,
+		})
 
-		const pagesInsert = uploadResults.map((page, idx) =>
-			supabase.from("pages").insert({
-				page: idx + 1,
-				manga: newManga?.[0]?.id,
-				image: `${process.env.SUPABASE_URL}/storage/v1/object/public/pages/${page}`,
-			}),
-		)
+		const groupsInsertPromise = insertMangaGroups({
+			groups: data.groups,
+			mangaId: newManga.id,
+		})
 
-		const authorsToInsert = Array.isArray(data.authors)
-			? data.authors
-			: [data.authors]
+		const authorsInsertPromise = insertMangaAuthors({
+			authors: data.authors,
+			mangaId: newManga.id,
+		})
 
-		const tagsToInsert = Array.isArray(data.tags) ? data.tags : [data.tags]
-
-		const groupsToInsert = Array.isArray(data.groups)
-			? data.groups
-			: [data.groups]
-
-		const authorsInsert = authorsToInsert.map((author) => ({
-			manga: newManga?.[0]?.id as number,
-			author: Number(author),
-		}))
-
-		const tagsInsert = tagsToInsert.map((tag) => ({
-			manga: newManga?.[0]?.id,
-			tag: Number(tag),
-		}))
-
-		const groupsInsert = groupsToInsert.map((group) => ({
-			manga: newManga?.[0]?.id,
-			groupid: Number(group),
-		}))
-
-		const authorsInsertPromise = authorsInsert.map((author) =>
-			supabase.from("mangas_authors").insert(author),
-		)
-		const tagsInsertPromise = tagsInsert.map((tag) =>
-			supabase.from("mangas_tags").insert(tag),
-		)
-
-		const groupsInsertPromise = groupsInsert.map((group) =>
-			supabase.from("mangas_groups").insert(group),
-		)
+		const tagsInsertPromise = insertMangaTags({
+			mangaId: newManga.id,
+			tags: data.tags,
+		})
 
 		await Promise.all([
-			...authorsInsertPromise,
-			...tagsInsertPromise,
-			...pagesInsert,
-			...groupsInsertPromise,
+			authorsInsertPromise,
+			tagsInsertPromise,
+			pagesInsertPromise,
+			groupsInsertPromise,
 		])
 
-		return redirect(`/mangas/${newManga?.[0]?.id}`)
+		return redirect(`/mangas/${newManga.id}`)
 	} catch (e) {
 		return { errors: { trueError: JSON.stringify(e) } }
 	}

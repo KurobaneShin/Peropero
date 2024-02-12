@@ -13,3 +13,45 @@ export async function getAuthorById(authorId: string) {
 
 	return data
 }
+
+export async function createAuthor(name: string) {
+	const { data, error } = await supabase
+		.from("authors")
+		.insert({
+			name,
+		})
+		.select()
+		.maybeSingle()
+
+	if (error) {
+		throw error
+	}
+
+	return data
+}
+
+export async function insertMangaAuthors({
+	mangaId,
+	authors,
+}: {
+	authors: string | string[]
+	mangaId: string | number
+}) {
+	const authorsToInsert = Array.isArray(authors) ? authors : [authors]
+
+	const mangaAuthor = authorsToInsert.map((authorId) => ({
+		author: Number(authorId),
+		manga: Number(mangaId),
+	}))
+
+	const { data, error } = await supabase
+		.from("mangas_authors")
+		.insert(mangaAuthor)
+		.select()
+
+	if (error) {
+		throw error
+	}
+
+	return data
+}
