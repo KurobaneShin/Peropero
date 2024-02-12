@@ -219,15 +219,18 @@ export default function New() {
 		if (files.length === loadingPages) setLoadingPages(undefined)
 	}, [files, loadingPages])
 
-	const processPages = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const processPages = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files?.length) {
 			setLoadingPages(e.target.files.length + files.length)
 			const filesArray = Array.from(e.target.files)
 
-			for (let i = 0; i < filesArray.length; i++) {
-				const file = filesArray[i]
-				transformFilesToWebp(file, i + 1, getObjectUrl, setFiles)
-			}
+			const promises = filesArray.map((file, idx) => {
+				return transformFilesToWebp(file, getObjectUrl, idx + 1)
+			})
+
+			const results = await Promise.all(promises)
+
+			setFiles(results)
 		}
 	}
 
