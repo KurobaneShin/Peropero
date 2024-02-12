@@ -1,5 +1,9 @@
-import { defer, LoaderFunctionArgs } from "@remix-run/node"
-import { Await, useLoaderData } from "@remix-run/react"
+import { defer, LoaderFunctionArgs, MetaFunction } from "@remix-run/node"
+import {
+	Await,
+	ClientLoaderFunctionArgs,
+	useLoaderData,
+} from "@remix-run/react"
 import { Suspense } from "react"
 import Page from "~/components/custom/Page"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
@@ -19,7 +23,21 @@ async function getMangasBuAuthorId(authorId: string) {
 	return data
 }
 
-export const loader = (args: LoaderFunctionArgs) => {
+async function getAuthorById(authorId: string) {
+	const { data, error } = await supabase
+		.from("authors")
+		.select("*")
+		.eq("id", authorId)
+		.maybeSingle()
+
+	if (error) {
+		throw error
+	}
+
+	return data
+}
+
+export const loader = async (args: LoaderFunctionArgs) => {
 	const authorId = args.params.authorId
 
 	if (!authorId) {
@@ -27,19 +45,59 @@ export const loader = (args: LoaderFunctionArgs) => {
 	}
 
 	const mangasPromise = getMangasBuAuthorId(authorId)
+	const author = await getAuthorById(authorId)
 
-	return defer({
-		mangasPromise,
-	})
+	return defer(
+		{
+			mangasPromise,
+			author,
+		},
+		{
+			headers: {
+				"Cache-Control": "max-age=3600, public",
+			},
+		},
+	)
+}
+
+export async function clientLoader({
+	serverLoader,
+	params,
+}: ClientLoaderFunctionArgs) {
+	const cacheKey = `/authors/${params.authorId}`
+
+	const cache = sessionStorage.getItem(cacheKey)
+
+	if (cache) {
+		return JSON.parse(cache)
+	}
+
+	const loaderData = await serverLoader<typeof loader>()
+
+	const author = loaderData.author
+	const mangasPromise = await loaderData.mangasPromise
+
+	sessionStorage.setItem(cacheKey, JSON.stringify({ mangasPromise, author }))
+
+	return { mangasPromise, author }
+}
+
+clientLoader.hydrate = true
+
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+	return [
+		{ title: `${data?.author?.name}` },
+		{ name: "description", content: `${data?.author?.name}` },
+	]
 }
 
 export default function AuthorId() {
-	const { mangasPromise } = useLoaderData<typeof loader>()
+	const { mangasPromise, author } = useLoaderData<typeof loader>()
 	return (
 		<Page>
 			<Card>
 				<CardHeader>
-					<CardTitle>Author</CardTitle>
+					<CardTitle>{author?.name}</CardTitle>
 				</CardHeader>
 				<CardContent>
 					<Suspense fallback={"carregando"}>
