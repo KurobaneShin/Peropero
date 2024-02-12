@@ -7,35 +7,8 @@ import {
 import { Suspense } from "react"
 import Page from "~/components/custom/Page"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
-import { supabase } from "~/infra/supabase"
 import { AlbumArtwork } from "../_index/components/album"
-
-async function getMangasBuAuthorId(authorId: string) {
-	const { data, error } = await supabase
-		.from("mangas")
-		.select("*,pages(*),mangas_authors(authors(*))")
-		.eq("mangas_authors.author", authorId)
-
-	if (error) {
-		throw error
-	}
-
-	return data
-}
-
-async function getAuthorById(authorId: string) {
-	const { data, error } = await supabase
-		.from("authors")
-		.select("*")
-		.eq("id", authorId)
-		.maybeSingle()
-
-	if (error) {
-		throw error
-	}
-
-	return data
-}
+import { getAuthorById, getMangasBuAuthorId } from "~/repositories/supabase"
 
 export const loader = async (args: LoaderFunctionArgs) => {
 	const authorId = args.params.authorId
@@ -97,7 +70,7 @@ export default function AuthorId() {
 		<Page>
 			<Card>
 				<CardHeader>
-					<CardTitle>{author?.name}</CardTitle>
+					<CardTitle>{author.name}</CardTitle>
 				</CardHeader>
 				<CardContent>
 					<Suspense fallback={"carregando"}>

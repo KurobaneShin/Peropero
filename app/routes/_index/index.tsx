@@ -13,45 +13,15 @@ import { Suspense } from "react"
 import { Button } from "~/components/ui/button"
 import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs"
-import { supabase } from "~/infra/supabase"
 import { AlbumArtwork } from "./components/album"
 import { Skeleton } from "~/components/ui/skeleton"
+import { getMangas, getNewestMangas } from "~/repositories/supabase/mangas"
 
 export const meta: MetaFunction = () => {
-	return [
-		{ title: "New Remix App" },
-		{ name: "description", content: "Welcome to Remix!" },
-	]
+	return [{ title: "Peropero" }, { name: "description", content: "mangas" }]
 }
 
-// biome-ignore lint/nursery/useAwait: <explanation>
-export const loader = async () => {
-	const getMangas = async () => {
-		const { data, error } = await supabase
-			.from("mangas")
-			.select("*,pages(*),mangas_authors(authors(*))")
-			.limit(6)
-
-		if (error) {
-			throw error
-		}
-		return data
-	}
-	const getNewestMangas = async () => {
-		const { data, error } = await supabase
-			.from("mangas")
-			.select("*,pages(*),mangas_authors(authors(*))")
-			.order("created_at", {
-				ascending: false,
-			})
-			.limit(20)
-
-		if (error) {
-			throw error
-		}
-		return data
-	}
-
+export const loader = () => {
 	return defer({ mangas: getMangas(), newestMangas: getNewestMangas() })
 }
 

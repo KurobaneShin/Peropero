@@ -12,7 +12,7 @@ import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader } from "~/components/ui/card"
 import { Skeleton } from "~/components/ui/skeleton"
 import { supabase } from "~/infra/supabase"
-import { getMangaDetails } from "~/repositories/mangas"
+import { getMangaDetails } from "~/repositories/supabase/mangas"
 
 export const loader = async (args: LoaderFunctionArgs) => {
 	const { mangaId } = args.params

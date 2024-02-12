@@ -1,0 +1,61 @@
+import { supabase } from "~/infra/supabase"
+
+export const getMangaDetails = async (mangaId: string) => {
+	const { data, error } = await supabase
+		.from("mangas")
+		.select(
+			"*,pages(*),mangas_tags(tags(*)),mangas_authors(authors(*)),mangas_groups(groups(*))",
+		)
+		.eq("id", Number(mangaId))
+		.order("page", {
+			ascending: true,
+			referencedTable: "pages",
+		})
+		.maybeSingle()
+
+	if (error || !data) {
+		throw error?.message || "Manga not found"
+	}
+
+	return data
+}
+
+export async function getMangasBuAuthorId(authorId: string) {
+	const { data, error } = await supabase
+		.from("mangas")
+		.select("*,pages(*),mangas_authors(authors(*))")
+		.eq("mangas_authors.author", authorId)
+
+	if (error) {
+		throw error
+	}
+
+	return data
+}
+
+export const getMangas = async () => {
+	const { data, error } = await supabase
+		.from("mangas")
+		.select("*,pages(*),mangas_authors(authors(*))")
+		.limit(6)
+
+	if (error) {
+		throw error
+	}
+	return data
+}
+
+export const getNewestMangas = async () => {
+	const { data, error } = await supabase
+		.from("mangas")
+		.select("*,pages(*),mangas_authors(authors(*))")
+		.order("created_at", {
+			ascending: false,
+		})
+		.limit(20)
+
+	if (error) {
+		throw error
+	}
+	return data
+}

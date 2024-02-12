@@ -2,15 +2,12 @@ import { defer, LoaderFunctionArgs, MetaFunction } from "@remix-run/node"
 import {
 	Await,
 	ClientLoaderFunctionArgs,
-	Link,
 	useLoaderData,
 	useParams,
-	useRouteLoaderData,
 } from "@remix-run/react"
 import { Suspense } from "react"
 import { Skeleton } from "~/components/ui/skeleton"
 import { supabase } from "~/infra/supabase"
-import { getMangaDetails } from "~/repositories/mangas"
 
 import {
 	Pagination,
@@ -20,6 +17,7 @@ import {
 import { Button } from "~/components/ui/button"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { PageLink } from "./PageLink"
+import { getMangaDetails } from "~/repositories/supabase"
 
 export const loader = async (args: LoaderFunctionArgs) => {
 	const { mangaId, page } = args.params
