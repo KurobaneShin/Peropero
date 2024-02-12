@@ -210,7 +210,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 export const clientAction = async ({
 	serverAction,
 }: ClientActionFunctionArgs) => {
-	sessionStorage.removeItem("/root")
+	sessionStorage.clear()
 	const data = await serverAction()
 	return data
 }

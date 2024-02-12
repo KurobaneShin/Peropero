@@ -54,7 +54,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
 		},
 		{
 			headers: {
-				"Cache-Control": "max-age=3600, public",
+				"Cache-Control": "max-age=60, public",
 			},
 		},
 	)
@@ -86,7 +86,7 @@ clientLoader.hydrate = true
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	return [
-		{ title: `${data?.author?.name}` },
+		{ title: `author | ${data?.author?.name}` },
 		{ name: "description", content: `${data?.author?.name}` },
 	]
 }

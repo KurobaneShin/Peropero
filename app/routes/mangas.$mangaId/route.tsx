@@ -35,7 +35,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
 		{ manga: getMangaDetails(mangaId), title: data.title },
 		{
 			headers: {
-				"Cache-Control": "max-age=3600, public",
+				"Cache-Control": "max-age=60, public",
 			},
 		},
 	)

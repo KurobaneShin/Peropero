@@ -61,7 +61,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
 		},
 		{
 			headers: {
-				"Cache-Control": "max-age=3600, public",
+				"Cache-Control": "max-age=60, public",
 			},
 		},
 	)
