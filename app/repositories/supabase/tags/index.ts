@@ -25,3 +25,14 @@ export async function insertMangaTags({
 
 	return data
 }
+
+export const selectAllTagsAsSelect = async () => {
+	const data = await supabase.from("tags").select("*")
+
+	return (
+		data.data?.map((tag) => ({
+			value: tag.id.toString(),
+			label: tag.title,
+		})) || []
+	)
+}

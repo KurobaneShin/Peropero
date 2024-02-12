@@ -39,8 +39,13 @@ import {
 	insertMangaAuthors,
 	insertMangaTags,
 	insertPages,
+	selectAllAuthorsAsSelect,
+	selectAllTagsAsSelect,
 } from "~/repositories/supabase"
-import { insertMangaGroups } from "~/repositories/supabase/groups"
+import {
+	insertMangaGroups,
+	selectAllGroupAsSelect,
+} from "~/repositories/supabase/groups"
 
 const { parse } = makeForm(
 	z.object({
@@ -61,43 +66,10 @@ const { parse } = makeForm(
 export const loader = async (args: LoaderFunctionArgs) => {
 	await getUser(args.request)
 
-	const authorsPromise = async () => {
-		const data = await supabase.from("authors").select("*")
-
-		return (
-			data.data?.map((author) => ({
-				value: author.id.toString(),
-				label: author.name,
-			})) || []
-		)
-	}
-
-	const tagsPromise = async () => {
-		const data = await supabase.from("tags").select("*")
-
-		return (
-			data.data?.map((tag) => ({
-				value: tag.id.toString(),
-				label: tag.title,
-			})) || []
-		)
-	}
-
-	const groupPromise = async () => {
-		const data = await supabase.from("groups").select("*")
-
-		return (
-			data.data?.map((group) => ({
-				value: group.id.toString(),
-				label: group.title,
-			})) || []
-		)
-	}
-
 	return defer({
-		authors: authorsPromise(),
-		tags: tagsPromise(),
-		groups: groupPromise(),
+		authors: selectAllAuthorsAsSelect(),
+		tags: selectAllTagsAsSelect(),
+		groups: selectAllGroupAsSelect(),
 	})
 }
 
@@ -197,8 +169,6 @@ export const clientAction = async ({
 export default function New() {
 	const { authors, tags, groups } = useLoaderData<typeof loader>()
 	const actionData = useActionData<typeof action>()
-
-	console.log(actionData)
 
 	const { pathname } = useLocation()
 
@@ -397,38 +367,36 @@ export default function New() {
 							)}
 
 							<div className="grid grid-cols-6 gap-4">
-								{files
-									.sort((a, b) => a.page - b.page)
-									.map((file, idx) => (
-										<div key={file.page}>
-											<AlbumArtwork
-												hasContextMenu={false}
-												key={file.page}
-												aspectRatio="portrait"
-												className="w-[150px]"
-												width={150}
-												height={150}
-												album={{
-													title: file.page.toString(),
-													cover: file.url,
-													artist: "",
-												}}
-											/>
-											<div>
-												<p>{file.page}</p>
-											</div>
-											<input
-												value={file.url}
-												type="hidden"
-												name={`file[${idx}][url]`}
-											/>
-											<input
-												value={file.page}
-												type="hidden"
-												name={`file[${idx}][page]`}
-											/>
+								{files.map((file, idx) => (
+									<div key={file.page}>
+										<AlbumArtwork
+											hasContextMenu={false}
+											key={file.page}
+											aspectRatio="portrait"
+											className="w-[150px]"
+											width={150}
+											height={150}
+											album={{
+												title: file.page.toString(),
+												cover: file.url,
+												artist: "",
+											}}
+										/>
+										<div>
+											<p>{file.page}</p>
 										</div>
-									))}
+										<input
+											value={file.url}
+											type="hidden"
+											name={`file[${idx}][url]`}
+										/>
+										<input
+											value={file.page}
+											type="hidden"
+											name={`file[${idx}][page]`}
+										/>
+									</div>
+								))}
 							</div>
 						</div>
 

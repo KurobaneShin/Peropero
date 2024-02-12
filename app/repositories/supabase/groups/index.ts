@@ -25,3 +25,14 @@ export async function insertMangaGroups({
 
 	return data
 }
+
+export async function selectAllGroupAsSelect() {
+	const data = await supabase.from("groups").select("*")
+
+	return (
+		data.data?.map((group) => ({
+			value: group.id.toString(),
+			label: group.title,
+		})) || []
+	)
+}

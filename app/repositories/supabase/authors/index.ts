@@ -55,3 +55,14 @@ export async function insertMangaAuthors({
 
 	return data
 }
+
+export const selectAllAuthorsAsSelect = async () => {
+	const data = await supabase.from("authors").select("*")
+
+	return (
+		data.data?.map((author) => ({
+			value: author.id.toString(),
+			label: author.name,
+		})) || []
+	)
+}
