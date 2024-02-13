@@ -23,7 +23,7 @@ import {
 	SheetFooter,
 	SheetHeader,
 } from "~/components/ui/sheet"
-import { supabase } from "~/infra/supabase"
+
 import { defaultClientAction } from "~/lib/defaultClientCache"
 import { getUser } from "~/lib/getUser"
 import { makeForm } from "~/lib/makeForm"

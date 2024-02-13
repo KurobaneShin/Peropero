@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test"
+import { describe, expect, mock, test } from "bun:test"
 import { loader } from "./route"
 
 describe("tags.new", () => {
@@ -10,6 +10,16 @@ describe("tags.new", () => {
 			expect(e).toBeInstanceOf(Response)
 			const location = (e as Response).headers.get("location")
 			expect(location).toEqual("/signin")
+		}
+	})
+	test("ensure get user is called", async () => {
+		const getUser = mock(() => {})
+		const request = new Request("localhost:3000/tags/new")
+		try {
+			await loader({ request, context: {}, params: {} })
+			expect(getUser).toHaveBeenCalled()
+		} catch (e) {
+			expect(e).toBeInstanceOf(Response)
 		}
 	})
 })

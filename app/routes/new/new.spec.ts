@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test"
+import { describe, expect, mock, test } from "bun:test"
 import { isDeferredData } from "@remix-run/server-runtime/dist/responses"
 import jwt from "jsonwebtoken"
 import { accessToken } from "~/cookies"
@@ -13,6 +13,16 @@ describe("new", () => {
 			expect(e).toBeInstanceOf(Response)
 			const location = (e as Response).headers.get("location")
 			expect(location).toEqual("/signin")
+		}
+	})
+	test("ensure get user is called", async () => {
+		const getUser = mock(() => {})
+		const request = new Request("localhost:3000/new")
+		try {
+			await loader({ request, context: {}, params: {} })
+			expect(getUser).toHaveBeenCalled()
+		} catch (e) {
+			expect(e).toBeInstanceOf(Response)
 		}
 	})
 	test("response", async () => {
