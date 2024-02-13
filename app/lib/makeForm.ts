@@ -15,7 +15,7 @@ export function makeForm<T extends z.ZodTypeAny>(schema: T) {
 						errors[issue.path.join(".") as keyof z.infer<T>] = issue.message
 						return errors
 					},
-					{} as { [k in keyof z.infer<T>]: string },
+					{} as { [K in keyof z.infer<T>]: string },
 				)
 				return { errors: issuesAsErrors, data: undefined }
 			}
@@ -23,7 +23,7 @@ export function makeForm<T extends z.ZodTypeAny>(schema: T) {
 		},
 		useFormHandlers: () => {
 			const actionData = useActionData() as {
-				errors?: { [k in keyof z.infer<T>]: string }
+				errors?: { [K in keyof z.infer<T>]: string }
 			}
 			const [errors, setErrors] = useState(actionData?.errors)
 			const statefulParser = (formData: FormData) => {
@@ -34,7 +34,7 @@ export function makeForm<T extends z.ZodTypeAny>(schema: T) {
 							errors[issue.path.join(".") as keyof z.infer<T>] = issue.message
 							return errors
 						},
-						{} as { [k in keyof z.infer<T>]: string },
+						{} as { [K in keyof z.infer<T>]: string },
 					)
 					setErrors(issuesAsErrors)
 

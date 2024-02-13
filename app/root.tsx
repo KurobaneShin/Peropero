@@ -14,13 +14,13 @@ import clsx from "clsx"
 import nProgress from "nprogress"
 import { useEffect } from "react"
 import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from "remix-themes"
+import { UserAvatar } from "./components/custom/UserAvatar"
+import { DrawerSidebar } from "./components/custom/drawerSidebar"
+import { ModeToggle } from "./components/custom/modeToggle"
+import { Button } from "./components/ui/button"
 import { accessToken, themeSessionResolver } from "./cookies"
 import "./globals.css"
 import { Sidebar } from "./routes/_index/components/sidebar"
-import { Button } from "./components/ui/button"
-import { ModeToggle } from "./components/custom/modeToggle"
-import { DrawerSidebar } from "./components/custom/drawerSidebar"
-import { UserAvatar } from "./components/custom/UserAvatar"
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const { getTheme } = await themeSessionResolver(request)

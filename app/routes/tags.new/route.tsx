@@ -44,7 +44,9 @@ export const action = async (args: ActionFunctionArgs) => {
 	const formData = await args.request.formData()
 	const { data, errors } = parse(formData)
 
-	if (errors) return { errors }
+	if (errors) {
+		return { errors }
+	}
 
 	const { title } = data
 
@@ -93,7 +95,7 @@ export default function New() {
 						</div>
 					</FormControl>
 					<SheetFooter>
-						<SheetClose asChild>
+						<SheetClose asChild={true}>
 							<Button disabled={isSubmitting} type="submit">
 								Create
 							</Button>

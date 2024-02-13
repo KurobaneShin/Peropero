@@ -1,14 +1,14 @@
+import Hcaptcha from "@hcaptcha/react-hcaptcha"
 import { type ActionFunctionArgs, redirect } from "@remix-run/node"
 import { Form, useActionData } from "@remix-run/react"
+import { ClassAttributes, LegacyRef, useRef, useState } from "react"
 import { z } from "zod"
 import { InputWithLabel } from "~/components/custom/inputWithLabel"
 import { Button } from "~/components/ui/button"
+import { Card, CardContent } from "~/components/ui/card"
 import { accessToken } from "~/cookies"
 import { supabase } from "~/infra/supabase"
 import { makeForm } from "~/lib/makeForm"
-import { useRef, useState } from "react"
-import Hcaptcha from "@hcaptcha/react-hcaptcha"
-import { Card, CardContent } from "~/components/ui/card"
 
 const { parse } = makeForm(
 	z.object({
@@ -74,7 +74,7 @@ export const action = async (agrs: ActionFunctionArgs) => {
 export default function Signup() {
 	const actionData = useActionData<typeof action>()
 	const [captchaToken, setCaptchaToken] = useState("")
-	const captchaRef = useRef<any>()
+	const captchaRef = useRef<Hcaptcha>(null)
 
 	if (actionData?.errors) {
 		captchaRef.current?.execute()

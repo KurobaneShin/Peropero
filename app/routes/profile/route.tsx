@@ -2,14 +2,14 @@ import { ActionFunctionArgs, redirect } from "@remix-run/node"
 import { Form } from "@remix-run/react"
 import { useState } from "react"
 import { z } from "zod"
+import { accessToken } from "~/cookies"
 import { useObjectUrls } from "~/hooks/useOjectUrls"
 import { supabase, superSupabase } from "~/infra/supabase"
-import { makeForm } from "~/lib/makeForm"
-import { AlbumArtwork } from "../_index/components/album"
-import { transformFileToWebp } from "~/lib/transformFileToWebp"
 import { b64toBlob } from "~/lib/b64toBlob"
 import { getUser } from "~/lib/getUser"
-import { accessToken } from "~/cookies"
+import { makeForm } from "~/lib/makeForm"
+import { transformFileToWebp } from "~/lib/transformFileToWebp"
+import { AlbumArtwork } from "../_index/components/album"
 
 const { parse } = makeForm(
 	z.object({
@@ -22,11 +22,10 @@ export const action = async (args: ActionFunctionArgs) => {
 	const data = parse(await args.request.formData())
 
 	if (data.errors) {
-		console.log(data.errors)
 		return {}
 	}
 
-	const blob = b64toBlob(data.data.profile, "image/webp")
+	const blob = await b64toBlob(data.data.profile, "image/webp")
 
 	const { error, data: image } = await superSupabase.storage
 		.from("avatars")
@@ -35,7 +34,7 @@ export const action = async (args: ActionFunctionArgs) => {
 		})
 
 	if (error) {
-		console.log(error)
+		return {}
 	}
 
 	const { data: profile } = await supabase

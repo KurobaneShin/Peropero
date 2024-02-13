@@ -4,7 +4,7 @@ import { ScrollArea } from "~/components/ui/scroll-area"
 import { cn } from "~/lib/utils"
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
-	playlists: any[]
+	playlists: never[]
 }
 
 const routes = [
@@ -16,8 +16,7 @@ const routes = [
 				xmlns="http://www.w3.org/2000/svg"
 				className="h-4 w-4 mr-2"
 				viewBox="0 0 20 20"
-				fill="currentColor"
-			>
+				fill="currentColor">
 				<title>Home</title>
 				<path
 					fillRule="evenodd"
@@ -74,13 +73,11 @@ export function Sidebar({ className, playlists }: SidebarProps) {
 							<Link
 								to={route.path}
 								prefetch="intent"
-								key={`${route.name}-${i}`}
-							>
+								key={`${route.name}-${i}`}>
 								<Button
 									variant={pathname === route.path ? "secondary" : "ghost"}
 									onClick={() => navigate(route.path)}
-									className={cn("w-full justify-start")}
-								>
+									className={cn("w-full justify-start")}>
 									{route.icon}
 									{route.name}
 								</Button>
@@ -97,13 +94,11 @@ export function Sidebar({ className, playlists }: SidebarProps) {
 							<Link
 								to={route.path}
 								prefetch="intent"
-								key={`${route.name}-${i}`}
-							>
+								key={`${route.name}-${i}`}>
 								<Button
 									variant={pathname === route.path ? "secondary" : "ghost"}
 									onClick={() => navigate(route.path)}
-									className={cn("w-full justify-start")}
-								>
+									className={cn("w-full justify-start")}>
 									{route.icon}
 									{route.name}
 								</Button>
@@ -121,8 +116,7 @@ export function Sidebar({ className, playlists }: SidebarProps) {
 								<Button
 									key={`${playlist}-${i}`}
 									variant="ghost"
-									className="w-full justify-start font-normal"
-								>
+									className="w-full justify-start font-normal">
 									<svg
 										xmlns="http://www.w3.org/2000/svg"
 										viewBox="0 0 24 24"
@@ -131,8 +125,8 @@ export function Sidebar({ className, playlists }: SidebarProps) {
 										strokeWidth="2"
 										strokeLinecap="round"
 										strokeLinejoin="round"
-										className="mr-2 h-4 w-4"
-									>
+										className="mr-2 h-4 w-4">
+										<title>favorites</title>
 										<path d="M21 15V6" />
 										<path d="M18.5 18a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" />
 										<path d="M12 12H3" />

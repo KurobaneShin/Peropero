@@ -1,9 +1,12 @@
 export type SessionStorage = {
-	get: (key: string) => any
-	set: (key: string, value: any) => void
+	get: (key: string) => unknown
+	set: (key: string, value: unknown) => void
 	remove: (key: string) => void
 	clear: () => void
-	setAsync: <T>(cacheKey: string, asyncData: any) => Promise<T>
+	setAsync: <T>(
+		cacheKey: string,
+		asyncData: Record<string, unknown>,
+	) => Promise<T>
 	removeMany: (keys: string[]) => void
 }
 
@@ -15,7 +18,7 @@ export const cache: SessionStorage = {
 		}
 		return undefined
 	},
-	set: (key: string, value: any) => {
+	set: (key: string, value: unknown) => {
 		sessionStorage.setItem(key, JSON.stringify(value))
 	},
 	remove: (key: string) => {
@@ -24,7 +27,7 @@ export const cache: SessionStorage = {
 	clear: () => {
 		sessionStorage.clear()
 	},
-	setAsync: async <T>(cacheKey: string, asyncData: any) => {
+	setAsync: async <T>(cacheKey: string, asyncData: Record<string, unknown>) => {
 		const resolved = {}
 
 		for (const [key, value] of Object.entries(asyncData)) {

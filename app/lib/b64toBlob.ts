@@ -4,8 +4,11 @@ export const b64toBlob = async (
 	sliceSize = 512,
 ): Promise<Blob> => {
 	return new Promise((resolve) => {
-		b64Data = b64Data.replace(/^data:image\/(png|jpg|jpeg|webp);base64,/, "")
-		const byteCharacters = atob(b64Data)
+		const b64Clean = b64Data.replace(
+			/^data:image\/(png|jpg|jpeg|webp);base64,/,
+			"",
+		)
+		const byteCharacters = atob(b64Clean)
 		const byteArrays = []
 
 		for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {

@@ -1,7 +1,7 @@
 import {
 	ActionFunctionArgs,
-	defer,
 	LoaderFunctionArgs,
+	defer,
 	redirect,
 } from "@remix-run/node"
 import {
@@ -18,19 +18,19 @@ import {
 import React, { Suspense, useEffect, useState } from "react"
 import { z } from "zod"
 import { zfd } from "zod-form-data"
+import { FormControl } from "~/components/custom/FormControl"
+import Page from "~/components/custom/Page"
 import { Combobox } from "~/components/custom/multipleCombobox"
 import { Button } from "~/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { Input } from "~/components/ui/input"
 import { useObjectUrls } from "~/hooks/useOjectUrls"
-import { makeForm } from "~/lib/makeForm"
-import { AlbumArtwork } from "./_index/components/album"
-import { getUser } from "~/lib/getUser"
 import { b64toBlob } from "~/lib/b64toBlob"
-import { transformFileToWebp } from "~/lib/transformFileToWebp"
+import { defaultClientCache } from "~/lib/defaultClientCache"
+import { getUser } from "~/lib/getUser"
+import { makeForm } from "~/lib/makeForm"
 import { transformFilesToWebp } from "~/lib/transFilesToWebp"
-import Page from "~/components/custom/Page"
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
-import { FormControl } from "~/components/custom/FormControl"
+import { transformFileToWebp } from "~/lib/transformFileToWebp"
 import {
 	createManga,
 	handleCoverUpload,
@@ -45,7 +45,7 @@ import {
 	insertMangaGroups,
 	selectAllGroupAsSelect,
 } from "~/repositories/supabase/groups"
-import { defaultClientCache } from "~/lib/defaultClientCache"
+import { AlbumArtwork } from "./_index/components/album"
 
 const { parse } = makeForm(
 	z.object({
@@ -148,7 +148,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 		return redirect(`/mangas/${newManga.id}`)
 	} catch (e) {
-		return { errors: { trueError: JSON.stringify((e as any).message) } }
+		return {
+			errors: {
+				trueError: JSON.stringify((e as Record<string, string>).message),
+			},
+		}
 	}
 }
 
@@ -180,7 +184,9 @@ export default function New() {
 	const isSubmitting = transition.state === "submitting"
 
 	useEffect(() => {
-		if (files.length === loadingPages) setLoadingPages(undefined)
+		if (files.length === loadingPages) {
+			setLoadingPages(undefined)
+		}
 	}, [files, loadingPages])
 
 	const processPages = async (e: React.ChangeEvent<HTMLInputElement>) => {

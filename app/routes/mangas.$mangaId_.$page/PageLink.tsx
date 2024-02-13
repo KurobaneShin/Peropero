@@ -29,7 +29,9 @@ export function PageLink({
 	})
 
 	const prefetchImage = () => {
-		if (prefetch === "none") return
+		if (prefetch === "none") {
+			return
+		}
 
 		if (image) {
 			const img = new Image()

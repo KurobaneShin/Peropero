@@ -2,11 +2,12 @@ export const useFormErrors = ({
 	errors,
 	name,
 }: {
-	errors: any
+	errors?: Record<string, string>
 	name: string
 }) => {
-	if (!name) return undefined
-	if (!errors) return undefined
-	if (!errors[name]) return undefined
+	if (!(name && errors && errors[name])) {
+		return undefined
+	}
+
 	return errors[name]
 }

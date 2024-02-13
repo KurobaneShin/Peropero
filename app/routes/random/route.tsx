@@ -7,7 +7,7 @@ export const loader = async () => {
 		head: true,
 	})
 
-	const randomId = Math.floor(Math.random() * count!) + 1
+	const randomId = Math.floor(Math.random() * (count ?? 0)) + 1
 
 	const { data } = await supabase
 		.from("mangas")

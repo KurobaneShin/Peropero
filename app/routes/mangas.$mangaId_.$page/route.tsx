@@ -1,4 +1,4 @@
-import { defer, LoaderFunctionArgs, MetaFunction } from "@remix-run/node"
+import { LoaderFunctionArgs, MetaFunction, defer } from "@remix-run/node"
 import {
 	Await,
 	ClientLoaderFunctionArgs,
@@ -8,25 +8,25 @@ import {
 import { Suspense } from "react"
 import { Skeleton } from "~/components/ui/skeleton"
 
+import { ChevronLeft, ChevronRight } from "lucide-react"
+import { Button } from "~/components/ui/button"
 import {
 	Pagination,
 	PaginationContent,
 	PaginationItem,
 } from "~/components/ui/pagination"
-import { Button } from "~/components/ui/button"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import { PageLink } from "./PageLink"
+import { defaultClientCache } from "~/lib/defaultClientCache"
 import {
 	getMangaDetails,
 	getMangaTitle,
 	getPage,
 } from "~/repositories/supabase"
-import { defaultClientCache } from "~/lib/defaultClientCache"
+import { PageLink } from "./PageLink"
 
 export const loader = async (args: LoaderFunctionArgs) => {
 	const { mangaId, page } = args.params
 
-	if (!mangaId || !page) {
+	if (!(mangaId && page)) {
 		throw new Error("Manga id and page is required")
 	}
 

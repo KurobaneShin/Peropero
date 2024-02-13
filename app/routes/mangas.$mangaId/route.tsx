@@ -1,4 +1,4 @@
-import { defer, LoaderFunctionArgs, MetaFunction } from "@remix-run/node"
+import { LoaderFunctionArgs, MetaFunction, defer } from "@remix-run/node"
 import {
 	Await,
 	ClientLoaderFunctionArgs,

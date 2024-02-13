@@ -12,11 +12,11 @@ import { PlusCircleIcon } from "lucide-react"
 import { Suspense } from "react"
 import { Button } from "~/components/ui/button"
 import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs"
-import { AlbumArtwork } from "./components/album"
 import { Skeleton } from "~/components/ui/skeleton"
-import { getMangas, getNewestMangas } from "~/repositories/supabase/mangas"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs"
 import { defaultClientCache } from "~/lib/defaultClientCache"
+import { getMangas, getNewestMangas } from "~/repositories/supabase/mangas"
+import { AlbumArtwork } from "./components/album"
 
 export const meta: MetaFunction = () => {
 	return [{ title: "Peropero" }, { name: "description", content: "mangas" }]

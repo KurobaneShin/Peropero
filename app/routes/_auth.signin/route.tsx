@@ -1,16 +1,14 @@
-import {
-	type ActionFunctionArgs,
-	type LoaderFunctionArgs,
-	redirect,
-} from "@remix-run/node"
-import { Form, Link, useActionData, useLoaderData } from "@remix-run/react"
-import { z } from "zod"
-import { supabase } from "~/infra/supabase"
-import { accessToken } from "~/cookies"
-import { makeForm } from "~/lib/makeForm"
+import { type ActionFunctionArgs, redirect } from "@remix-run/node"
+import { Form, Link, useActionData } from "@remix-run/react"
 import { useRef, useState } from "react"
+import { z } from "zod"
+import { accessToken } from "~/cookies"
+import { supabase } from "~/infra/supabase"
+import { makeForm } from "~/lib/makeForm"
 
 import Hcaptcha from "@hcaptcha/react-hcaptcha"
+import { FormControl } from "~/components/custom/FormControl"
+import { Button } from "~/components/ui/button"
 import {
 	Card,
 	CardContent,
@@ -19,8 +17,6 @@ import {
 	CardHeader,
 	CardTitle,
 } from "~/components/ui/card"
-import { Button } from "~/components/ui/button"
-import { FormControl } from "~/components/custom/FormControl"
 import { Input } from "~/components/ui/input"
 
 const { parse } = makeForm(
@@ -90,7 +86,7 @@ export const action = async (agrs: ActionFunctionArgs) => {
 export default function SignIn() {
 	const actionData = useActionData<typeof action>()
 	const [captchaToken, setCaptchaToken] = useState("")
-	const captchaRef = useRef<any>()
+	const captchaRef = useRef<Hcaptcha>(null)
 
 	if (actionData?.errors) {
 		captchaRef.current?.execute()
