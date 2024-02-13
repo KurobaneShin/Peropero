@@ -22,7 +22,6 @@ import { Combobox } from "~/components/custom/multipleCombobox"
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
 import { useObjectUrls } from "~/hooks/useOjectUrls"
-import { supabase } from "~/infra/supabase"
 import { makeForm } from "~/lib/makeForm"
 import { AlbumArtwork } from "./_index/components/album"
 import { getUser } from "~/lib/getUser"
@@ -46,6 +45,7 @@ import {
 	insertMangaGroups,
 	selectAllGroupAsSelect,
 } from "~/repositories/supabase/groups"
+import { defaultClientCache } from "~/lib/defaultClientCache"
 
 const { parse } = makeForm(
 	z.object({
@@ -66,28 +66,22 @@ const { parse } = makeForm(
 export const loader = async (args: LoaderFunctionArgs) => {
 	await getUser(args.request)
 
-	return defer({
-		authors: selectAllAuthorsAsSelect(),
-		tags: selectAllTagsAsSelect(),
-		groups: selectAllGroupAsSelect(),
-	})
+	return defer(
+		{
+			authors: selectAllAuthorsAsSelect(),
+			tags: selectAllTagsAsSelect(),
+			groups: selectAllGroupAsSelect(),
+		},
+		{
+			headers: {
+				"Cache-Control": "public, max-age=60, s-maxage=60",
+			},
+		},
+	)
 }
 
-export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
-	const cacheKey = "/new"
-	const cache = sessionStorage.getItem(cacheKey)
-
-	if (cache) return JSON.parse(cache)
-
-	const loaderData = await serverLoader<typeof loader>()
-
-	const tags = await loaderData.tags
-	const authors = await loaderData.authors
-	const groups = await loaderData.groups
-
-	sessionStorage.setItem(cacheKey, JSON.stringify({ tags, authors, groups }))
-	return { tags, authors, groups }
-}
+export const clientLoader = async (args: ClientLoaderFunctionArgs) =>
+	defaultClientCache("/new", args)
 
 clientLoader.hydrate = true
 
