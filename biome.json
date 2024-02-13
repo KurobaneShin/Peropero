@@ -12,6 +12,9 @@
 			},
 			"correctness": {
 				"noUndeclaredVariables": "off"
+			},
+			"style": {
+				"useBlockStatements": "off"
 			}
 		}
 	},
