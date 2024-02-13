@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs"
 import { AlbumArtwork } from "./components/album"
 import { Skeleton } from "~/components/ui/skeleton"
 import { getMangas, getNewestMangas } from "~/repositories/supabase/mangas"
+import { defaultClientCache } from "~/lib/defaultClientCache"
 
 export const meta: MetaFunction = () => {
 	return [{ title: "Peropero" }, { name: "description", content: "mangas" }]
@@ -25,21 +26,8 @@ export const loader = () => {
 	return defer({ mangas: getMangas(), newestMangas: getNewestMangas() })
 }
 
-export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
-	const cacheKey = "/root"
-	const cache = sessionStorage.getItem(cacheKey)
-
-	if (cache) {
-		return JSON.parse(cache)
-	}
-
-	const loaderData = await serverLoader<typeof loader>()
-
-	const newestMangas = await loaderData.newestMangas
-	const mangas = await loaderData.mangas
-
-	sessionStorage.setItem(cacheKey, JSON.stringify({ mangas, newestMangas }))
-	return { mangas, newestMangas }
+export async function clientLoader(args: ClientLoaderFunctionArgs) {
+	return defaultClientCache("/root", args)
 }
 
 clientLoader.hydrate = true

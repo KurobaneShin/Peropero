@@ -9,6 +9,7 @@ import Page from "~/components/custom/Page"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { AlbumArtwork } from "../_index/components/album"
 import { getAuthorById, getMangasBuAuthorId } from "~/repositories/supabase"
+import { defaultClientCache } from "~/lib/defaultClientCache"
 
 export const loader = async (args: LoaderFunctionArgs) => {
 	const authorId = args.params.authorId
@@ -33,26 +34,9 @@ export const loader = async (args: LoaderFunctionArgs) => {
 	)
 }
 
-export async function clientLoader({
-	serverLoader,
-	params,
-}: ClientLoaderFunctionArgs) {
-	const cacheKey = `/authors/${params.authorId}`
-
-	const cache = sessionStorage.getItem(cacheKey)
-
-	if (cache) {
-		return JSON.parse(cache)
-	}
-
-	const loaderData = await serverLoader<typeof loader>()
-
-	const author = loaderData.author
-	const mangasPromise = await loaderData.mangasPromise
-
-	sessionStorage.setItem(cacheKey, JSON.stringify({ mangasPromise, author }))
-
-	return { mangasPromise, author }
+export async function clientLoader(args: ClientLoaderFunctionArgs) {
+	const cacheKey = `/authors/${args.params.authorId}`
+	return defaultClientCache(cacheKey, args)
 }
 
 clientLoader.hydrate = true

@@ -11,6 +11,7 @@ import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader } from "~/components/ui/card"
 import { Skeleton } from "~/components/ui/skeleton"
+import { defaultClientCache } from "~/lib/defaultClientCache"
 import { getMangaDetails, getMangaTitle } from "~/repositories/supabase"
 
 export const loader = async (args: LoaderFunctionArgs) => {
@@ -42,26 +43,9 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	]
 }
 
-export async function clientLoader({
-	serverLoader,
-	params,
-}: ClientLoaderFunctionArgs) {
-	const cacheKey = `/mangas/${params.mangaId}`
-	const cache = sessionStorage.getItem(cacheKey)
-
-	if (cache) {
-		return JSON.parse(cache)
-	}
-
-	const loaderData = await serverLoader<typeof loader>()
-
-	const manga = await loaderData.manga
-
-	sessionStorage.setItem(
-		cacheKey,
-		JSON.stringify({ manga, title: loaderData.title }),
-	)
-	return { manga, title: loaderData.title }
+export async function clientLoader(args: ClientLoaderFunctionArgs) {
+	const cacheKey = `/mangas/${args.params.mangaId}`
+	return defaultClientCache(cacheKey, args)
 }
 
 clientLoader.hydrate = true

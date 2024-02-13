@@ -21,6 +21,7 @@ import {
 	getMangaTitle,
 	getPage,
 } from "~/repositories/supabase"
+import { defaultClientCache } from "~/lib/defaultClientCache"
 
 export const loader = async (args: LoaderFunctionArgs) => {
 	const { mangaId, page } = args.params
@@ -57,28 +58,9 @@ export const meta: MetaFunction<typeof loader> = ({ data, params }) => {
 	]
 }
 
-export async function clientLoader({
-	serverLoader,
-	params,
-}: ClientLoaderFunctionArgs) {
-	const cacheKey = `/mangas/${params.mangaId}/${params.page}`
-	const cache = sessionStorage.getItem(cacheKey)
-
-	if (cache) {
-		return JSON.parse(cache)
-	}
-
-	const loaderData = await serverLoader<typeof loader>()
-
-	const manga = await loaderData.manga
-	const page = await loaderData.page
-
-	sessionStorage.setItem(
-		cacheKey,
-		JSON.stringify({ manga, page, title: loaderData.title }),
-	)
-
-	return { manga, page, title: loaderData.title }
+export async function clientLoader(args: ClientLoaderFunctionArgs) {
+	const cacheKey = `/mangas/${args.params.mangaId}/${args.params.page}`
+	return defaultClientCache(cacheKey, args)
 }
 
 clientLoader.hydrate = true
