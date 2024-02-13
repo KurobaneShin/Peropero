@@ -45,7 +45,7 @@ import {
 	insertMangaGroups,
 	selectAllGroupAsSelect,
 } from "~/repositories/supabase/groups"
-import { AlbumArtwork } from "./_index/components/album"
+import { AlbumArtwork } from "../_index/components/album"
 
 const { parse } = makeForm(
 	z.object({

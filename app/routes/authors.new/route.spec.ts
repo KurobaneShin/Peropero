@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { supabase } from "~/infra/supabase"
+import { deleteAuthor, selectLastInsertedAuthor } from "~/repositories/supabase"
 import { action, loader } from "./route"
 
 describe("authors.new", () => {
@@ -14,7 +14,7 @@ describe("authors.new", () => {
 		}
 	})
 
-	test("post is validated correctly", async () => {
+	test("test if author is created correctly", async () => {
 		const body = new URLSearchParams({
 			name: "test",
 		})
@@ -26,16 +26,11 @@ describe("authors.new", () => {
 		expect(response).toBeInstanceOf(Response)
 		const location = (response as Response).headers.get("location")
 
-		const lastInserted = await supabase
-			.from("authors")
-			.select("*")
-			.order("id", { ascending: false })
-			.limit(1)
-			.maybeSingle()
+		const lastInserted = await selectLastInsertedAuthor()
 
-		expect(lastInserted.data?.name).toEqual("test")
-		if (!lastInserted.data?.id) throw new Error("No id found")
-		await supabase.from("authors").delete().eq("id", lastInserted.data?.id)
+		expect(lastInserted.name).toEqual("test")
+		if (!lastInserted.id) throw new Error("No id found")
+		await deleteAuthor(lastInserted.id)
 
 		expect(location).toEqual("/new")
 	})
