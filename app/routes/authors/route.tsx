@@ -1,3 +1,4 @@
+import { LoaderFunctionArgs } from "@remix-run/node"
 import { Link, Outlet, useLoaderData, useLocation } from "@remix-run/react"
 import Page from "~/components/custom/Page"
 import { Button } from "~/components/ui/button"
@@ -12,7 +13,7 @@ import {
 } from "~/components/ui/table"
 import { supabase } from "~/infra/supabase"
 
-export const loader = async () => {
+export const loader = async (args: LoaderFunctionArgs) => {
 	const { data, error } = await supabase
 		.from("authors")
 		.select("*,mangas_authors(mangas(id))")
