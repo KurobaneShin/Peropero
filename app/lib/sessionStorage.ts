@@ -7,6 +7,7 @@ export type SessionStorage = {
 		cacheKey: string,
 		asyncData: Record<string, unknown>,
 	) => Promise<T>
+	removeMany: (keys: string[]) => void
 }
 
 export const cache: SessionStorage = {
@@ -40,5 +41,10 @@ export const cache: SessionStorage = {
 		cache.set(cacheKey, resolved)
 
 		return resolved as T
+	},
+	removeMany: (keys: string[]) => {
+		for (const key of keys) {
+			sessionStorage.removeItem(key)
+		}
 	},
 }

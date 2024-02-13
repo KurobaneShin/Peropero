@@ -1,4 +1,7 @@
-import { ClientLoaderFunctionArgs } from "@remix-run/react"
+import {
+	ClientActionFunctionArgs,
+	ClientLoaderFunctionArgs,
+} from "@remix-run/react"
 import { cache } from "./sessionStorage"
 
 export const defaultClientCache = async (
@@ -14,4 +17,10 @@ export const defaultClientCache = async (
 	const loaderData = await args.serverLoader()
 
 	return cache.setAsync(cacheKey, loaderData as Record<string, unknown>)
+}
+
+export const defaultClientAction = async (args: ClientActionFunctionArgs) => {
+	cache.clear()
+	const data = await args.serverAction()
+	return data
 }

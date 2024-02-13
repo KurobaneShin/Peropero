@@ -36,3 +36,13 @@ export const selectAllTagsAsSelect = async () => {
 		})) || []
 	)
 }
+
+export const createTag = async (title: string) => {
+	const { data, error } = await supabase.from("tags").insert({ title }).select()
+
+	if (error) {
+		throw error
+	}
+
+	return data
+}
