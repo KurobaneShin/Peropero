@@ -1,4 +1,4 @@
-import { defer, LoaderFunctionArgs, MetaFunction } from "@remix-run/node"
+import { LoaderFunctionArgs, MetaFunction, defer } from "@remix-run/node"
 import {
 	Await,
 	ClientLoaderFunctionArgs,
@@ -7,9 +7,9 @@ import {
 import { Suspense } from "react"
 import Page from "~/components/custom/Page"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
-import { AlbumArtwork } from "../_index/components/album"
-import { getAuthorById, getMangasBuAuthorId } from "~/repositories/supabase"
 import { defaultClientCache } from "~/lib/defaultClientCache"
+import { getAuthorById, getMangasBuAuthorId } from "~/repositories/supabase"
+import { AlbumArtwork } from "../_index/components/album"
 
 export const loader = async (args: LoaderFunctionArgs) => {
 	const authorId = args.params.authorId

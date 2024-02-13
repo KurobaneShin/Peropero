@@ -1,17 +1,13 @@
+import { Menu } from "lucide-react"
+import { Sidebar } from "~/routes/_index/components/sidebar"
 import {
 	Drawer,
 	DrawerClose,
 	DrawerContent,
-	DrawerDescription,
 	DrawerFooter,
-	DrawerHeader,
-	DrawerTitle,
 	DrawerTrigger,
 } from "../ui/drawer"
-import { Button } from "../ui/button"
-import { Sidebar } from "~/routes/_index/components/sidebar"
 import { ScrollArea } from "../ui/scroll-area"
-import { Menu } from "lucide-react"
 
 export function DrawerSidebar() {
 	return (

@@ -7,7 +7,9 @@ export const defaultClientCache = async (
 ) => {
 	const cacheData = cache.get(cacheKey)
 
-	if (cacheData) return cacheData
+	if (cacheData) {
+		return cacheData
+	}
 
 	const loaderData = await args.serverLoader()
 

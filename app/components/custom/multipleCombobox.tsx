@@ -59,7 +59,9 @@ export const handleMultipleSelect = (
 	option: ComboboxOption,
 ) => {
 	if (props.value?.includes(option.value)) {
-		if (!props.clearable && props.value.length === 1) return false
+		if (!props.clearable && props.value.length === 1) {
+			return false
+		}
 		props.onValueChange?.(props.value.filter((value) => value !== option.value))
 	} else {
 		props.onValueChange?.([...(props.value ?? []), option.value])
@@ -77,8 +79,7 @@ export const Combobox = forwardRef(
 						role="combobox"
 						variant="outline"
 						aria-expanded={open}
-						className="w-full justify-between hover:bg-secondary/20 active:scale-100"
-					>
+						className="w-full justify-between hover:bg-secondary/20 active:scale-100">
 						<span className="line-clamp-1 text-left font-normal">
 							{props.multiple && props.value && props.value.length === 1 && (
 								<span className="mr-2">
@@ -142,7 +143,9 @@ export const Combobox = forwardRef(
 														option.value.toLowerCase().trim() === selectedValue,
 												)
 
-												if (!option) return null
+												if (!option) {
+													return null
+												}
 
 												if (props.multiple) {
 													handleMultipleSelect(props, option)
@@ -151,8 +154,7 @@ export const Combobox = forwardRef(
 
 													setOpen(false)
 												}
-											}}
-										>
+											}}>
 											<Check
 												className={cn(
 													"mr-2 h-4 w-4 opacity-0",

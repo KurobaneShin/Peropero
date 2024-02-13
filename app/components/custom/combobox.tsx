@@ -33,8 +33,7 @@ export function ComboboxDemo({ items, name, label }: Props) {
 						variant="outline"
 						role="combobox"
 						aria-expanded={open}
-						className="w-[200px] justify-between"
-					>
+						className="w-[200px] justify-between">
 						{value
 							? items.find((item) => item.value === value)?.label
 							: "Selecione um item..."}
@@ -53,8 +52,7 @@ export function ComboboxDemo({ items, name, label }: Props) {
 									onSelect={(currentValue) => {
 										setValue(currentValue === value ? "" : currentValue)
 										setOpen(false)
-									}}
-								>
+									}}>
 									<Check
 										className={cn(
 											"mr-2 h-4 w-4",

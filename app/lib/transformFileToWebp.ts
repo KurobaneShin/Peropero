@@ -7,7 +7,7 @@ export const transformFileToWebp = (
 ) => {
 	const image = new Image()
 	image.src = getObjectUrl(file)
-	image.onload = (e) => {
+	image.onload = (_e) => {
 		const canvas = document.createElement("canvas")
 		const ctx = canvas.getContext("2d")
 

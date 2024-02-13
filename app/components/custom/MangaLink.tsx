@@ -1,6 +1,7 @@
 import { Link } from "@remix-run/react"
 import { useEffect, useState } from "react"
 
+type PrefetchBehavior = "intent" | "render" | "none" | "viewport"
 export function MangaLink({
 	id,
 	children,
@@ -26,7 +27,9 @@ export function MangaLink({
 	})
 
 	const prefetchImage = () => {
-		if (prefetch === "none") return
+		if (prefetch === "none") {
+			return
+		}
 
 		if (cover) {
 			const img = new Image()
@@ -44,7 +47,7 @@ export function MangaLink({
 	return (
 		<Link
 			to={`/mangas/${id}`}
-			prefetch={prefetch as any}
+			prefetch={prefetch as PrefetchBehavior}
 			onMouseEnter={prefetchImage}
 			onFocus={prefetchImage}>
 			{children}

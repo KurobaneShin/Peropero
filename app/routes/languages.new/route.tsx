@@ -99,7 +99,7 @@ export default function New() {
 						</div>
 					</FormControl>
 					<SheetFooter>
-						<SheetClose asChild>
+						<SheetClose asChild={true}>
 							<Button disabled={isSubmitting} type="submit">
 								Create
 							</Button>

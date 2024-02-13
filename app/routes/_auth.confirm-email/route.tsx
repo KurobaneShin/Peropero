@@ -1,5 +1,4 @@
 import { LoaderFunctionArgs } from "@remix-run/node"
-import { jwtDecode } from "jwt-decode"
 import { redirect } from "react-router"
 import { accessToken } from "~/cookies"
 import { supabase } from "~/infra/supabase"
@@ -7,10 +6,10 @@ import { supabase } from "~/infra/supabase"
 export const loader = async (args: LoaderFunctionArgs) => {
 	const url = new URL(args.request.url)
 
-	const token_hash = url.searchParams.get("token_hash")
+	const tokenHash = url.searchParams.get("token_hash")
 	const type = url.searchParams.get("type")
 
-	if (!token_hash || !type) {
+	if (!(tokenHash && type)) {
 		return {}
 	}
 
@@ -20,7 +19,8 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
 	const { error, data } = await supabase.auth.verifyOtp({
 		type: type as "email",
-		token_hash,
+		// biome-ignore lint/style/useNamingConvention: third-party API
+		token_hash: tokenHash as string,
 	})
 
 	if (error || !data || !data.user) {

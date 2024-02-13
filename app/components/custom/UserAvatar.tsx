@@ -1,7 +1,7 @@
 import { Link } from "@remix-run/react"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
 import { Button } from "../ui/button"
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
 
 type UserAvatarProps = {
 	userName: string

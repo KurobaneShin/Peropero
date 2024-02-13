@@ -11,7 +11,9 @@ export async function handlePageUploads(
 			.from("pages")
 			.upload(`pages-${Math.random().toString(36).substring(7)}`, file.file)
 			.then((res) => {
-				if (res.error) throw res.error
+				if (res.error) {
+					throw res.error
+				}
 				return {
 					page: file.page,
 					url: res.data.path,

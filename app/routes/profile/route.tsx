@@ -22,7 +22,6 @@ export const action = async (args: ActionFunctionArgs) => {
 	const data = parse(await args.request.formData())
 
 	if (data.errors) {
-		console.log(data.errors)
 		return {}
 	}
 
@@ -35,7 +34,7 @@ export const action = async (args: ActionFunctionArgs) => {
 		})
 
 	if (error) {
-		console.log(error)
+		return {}
 	}
 
 	const { data: profile } = await supabase
