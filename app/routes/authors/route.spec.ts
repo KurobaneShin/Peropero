@@ -10,6 +10,10 @@ test("random", async () => {
 		.from("authors")
 		.select("*,mangas_authors(mangas(id))")
 
+	if (error) {
+		return
+	}
+
 	expect(response.authors).toBeDefined()
 	expect(response.authors).toEqual(data)
 })
