@@ -70,7 +70,7 @@ function App() {
 			<body>
 				<div className="flex h-16 items-center justify-center gap-2 px-4 border-b">
 					<Link to="/">
-						<div>Hentai</div>
+						<div>Peropero</div>
 					</Link>
 					<div className="lg:hidden mb-[-0.3rem]">
 						<DrawerSidebar />

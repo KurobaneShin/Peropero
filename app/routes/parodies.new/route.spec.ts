@@ -1,5 +1,4 @@
 import { describe, expect, mock, test } from "bun:test"
-import { redirect } from "@remix-run/node"
 import { loader } from "./route"
 
 describe("parodies.new", () => {
@@ -13,7 +12,7 @@ describe("parodies.new", () => {
 			expect(location).toEqual("/signin")
 		}
 	})
-	test("ensure if get user is called", async () => {
+	test("ensure get user is called", async () => {
 		const getUser = mock(() => {})
 		const request = new Request("localhost:3000/parodies/new")
 		try {
