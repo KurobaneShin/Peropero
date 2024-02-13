@@ -1,4 +1,5 @@
-import { describe, expect, test } from "bun:test"
+import { describe, expect, mock, test } from "bun:test"
+import { redirect } from "@remix-run/node"
 import { loader } from "./route"
 
 describe("parodies.new", () => {
@@ -10,6 +11,16 @@ describe("parodies.new", () => {
 			expect(e).toBeInstanceOf(Response)
 			const location = (e as Response).headers.get("location")
 			expect(location).toEqual("/signin")
+		}
+	})
+	test("ensure if get user is called", async () => {
+		const getUser = mock(() => {})
+		const request = new Request("localhost:3000/parodies/new")
+		try {
+			await loader({ request, context: {}, params: {} })
+			expect(getUser).toHaveBeenCalled()
+		} catch (e) {
+			expect(e).toBeInstanceOf(Response)
 		}
 	})
 })
