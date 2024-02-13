@@ -1,4 +1,10 @@
-import { Link, Outlet, useLoaderData, useLocation } from "@remix-run/react"
+import {
+	ClientLoaderFunctionArgs,
+	Link,
+	Outlet,
+	useLoaderData,
+	useLocation,
+} from "@remix-run/react"
 import Page from "~/components/custom/Page"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
@@ -11,6 +17,7 @@ import {
 	TableRow,
 } from "~/components/ui/table"
 import { supabase } from "~/infra/supabase"
+import { defaultClientCache } from "~/lib/defaultClientCache"
 
 export const loader = async () => {
 	const { data, error } = await supabase
@@ -23,6 +30,11 @@ export const loader = async () => {
 
 	return { tags: data }
 }
+
+export function clientLoader(args: ClientLoaderFunctionArgs) {
+	return defaultClientCache("/tags", args)
+}
+
 export default function Tags() {
 	const { tags } = useLoaderData<typeof loader>()
 
