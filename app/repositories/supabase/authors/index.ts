@@ -66,3 +66,28 @@ export const selectAllAuthorsAsSelect = async () => {
 		})) || []
 	)
 }
+
+export async function deleteAuthor(authorId: string | number) {
+	const { error } = await supabase.from("authors").delete().eq("id", authorId)
+
+	if (error) {
+		throw error
+	}
+
+	return true
+}
+
+export async function selectLastInsertedAuthor() {
+	const { data, error } = await supabase
+		.from("authors")
+		.select("*")
+		.order("id", { ascending: false })
+		.limit(1)
+		.maybeSingle()
+
+	if (error || !data) {
+		throw new Error("No author found")
+	}
+
+	return data
+}
