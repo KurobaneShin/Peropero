@@ -13,7 +13,6 @@ import {
 import { useEffect, useState } from "react"
 import { z } from "zod"
 import { FormControl } from "~/components/custom/FormControl"
-import { InputWithLabel } from "~/components/custom/inputWithLabel"
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
@@ -25,8 +24,10 @@ import {
 	SheetHeader,
 } from "~/components/ui/sheet"
 import { supabase } from "~/infra/supabase"
+import { defaultClientAction } from "~/lib/defaultClientCache"
 import { getUser } from "~/lib/getUser"
 import { makeForm } from "~/lib/makeForm"
+import { createTag } from "~/repositories/supabase"
 
 const { parse } = makeForm(
 	z.object({
@@ -47,19 +48,13 @@ export const action = async (args: ActionFunctionArgs) => {
 
 	const { title } = data
 
-	await supabase.from("tags").insert({
-		title,
-	})
+	await createTag(title)
+
 	return redirect("/new")
 }
 
-export const clientAction = async ({
-	serverAction,
-}: ClientActionFunctionArgs) => {
-	sessionStorage.removeItem("/new")
-	const data = await serverAction()
-	return data
-}
+export const clientAction = async (args: ClientActionFunctionArgs) =>
+	defaultClientAction(args)
 
 export default function New() {
 	const transition = useNavigation()
