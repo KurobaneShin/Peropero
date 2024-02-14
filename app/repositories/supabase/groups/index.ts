@@ -36,3 +36,17 @@ export async function selectAllGroupAsSelect() {
 		})) || []
 	)
 }
+
+export async function getGroupById(id: string) {
+	const { data, error } = await supabase
+		.from("groups")
+		.select()
+		.eq("id", id)
+		.maybeSingle()
+
+	if (error || !data) {
+		throw error || new Error("Group not found")
+	}
+
+	return data
+}
