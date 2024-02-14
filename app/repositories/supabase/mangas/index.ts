@@ -46,6 +46,19 @@ export const getMangasByTagId = async (tagId: string) => {
 	return data
 }
 
+export const getMangasByGroupId = async (groupId: string) => {
+	const { data, error } = await supabase
+		.from("mangas")
+		.select("*,pages(*),mangas_groups!inner(groups(*))")
+		.eq("mangas_groups.groupid", groupId)
+
+	if (error) {
+		throw error.message
+	}
+
+	return data
+}
+
 export const getMangas = async () => {
 	const { data, error } = await supabase
 		.from("mangas")
