@@ -46,3 +46,17 @@ export const createTag = async (title: string) => {
 
 	return data
 }
+
+export const getTagById = async (id: string) => {
+	const { data, error } = await supabase
+		.from("tags")
+		.select()
+		.eq("id", id)
+		.maybeSingle()
+
+	if (error) {
+		throw error
+	}
+
+	return data
+}
