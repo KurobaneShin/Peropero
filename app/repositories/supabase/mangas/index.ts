@@ -33,6 +33,19 @@ export async function getMangasBuAuthorId(authorId: string) {
 	return data
 }
 
+export async function getMangasByCharacterId(characterId: string) {
+	const { data, error } = await supabase
+		.from("mangas")
+		.select("*,pages(*),mangas_characters!inner(characterid(*))")
+		.eq("mangas_characters.characterid", characterId)
+
+	if (error) {
+		throw error
+	}
+
+	return data
+}
+
 export const getMangasByTagId = async (tagId: string) => {
 	const { data, error } = await supabase
 		.from("mangas")
