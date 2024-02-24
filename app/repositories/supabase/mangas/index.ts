@@ -33,6 +33,22 @@ export async function getMangasBuAuthorId(authorId: string) {
 	return data
 }
 
+<<<<<<< Updated upstream
+=======
+export async function getMangasByLanguageId(languageId: string) {
+	const { data, error } = await supabase
+		.from("mangas")
+		.select("*,pages(*),mangas_languages!inner(languages(*))")
+		.eq("mangas_languages.languageid", languageId)
+
+	if (error) {
+		throw error
+	}
+
+	return data
+}
+
+>>>>>>> Stashed changes
 export async function getMangasByCharacterId(characterId: string) {
 	const { data, error } = await supabase
 		.from("mangas")
@@ -51,6 +67,19 @@ export const getMangasByTagId = async (tagId: string) => {
 		.from("mangas")
 		.select("*,pages(*),mangas_tags!inner(tags(*))")
 		.eq("mangas_tags.tag", tagId)
+
+	if (error) {
+		throw error.message
+	}
+
+	return data
+}
+
+export const getMangasByParodyId = async (parodyId: string) => {
+	const { data, error } = await supabase
+		.from("mangas")
+		.select("*,pages(*),mangas_parodies!inner(parodies(*))")
+		.eq("mangas_parodies.parody", parodyId)
 
 	if (error) {
 		throw error.message
