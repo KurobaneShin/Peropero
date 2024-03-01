@@ -3,6 +3,7 @@
 ```shellscript
 bun i
 bun run dev
+supabase start
 ```
 
 ## Deployment
