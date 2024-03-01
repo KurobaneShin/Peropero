@@ -33,8 +33,6 @@ export async function getMangasBuAuthorId(authorId: string) {
 	return data
 }
 
-<<<<<<< Updated upstream
-=======
 export async function getMangasByLanguageId(languageId: string) {
 	const { data, error } = await supabase
 		.from("mangas")
@@ -48,7 +46,6 @@ export async function getMangasByLanguageId(languageId: string) {
 	return data
 }
 
->>>>>>> Stashed changes
 export async function getMangasByCharacterId(characterId: string) {
 	const { data, error } = await supabase
 		.from("mangas")

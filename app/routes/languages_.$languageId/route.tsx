@@ -1,3 +1,4 @@
+
 import { LoaderFunctionArgs, MetaFunction, defer } from "@remix-run/node"
 import {
 	Await,
@@ -8,23 +9,23 @@ import { Suspense } from "react"
 import Page from "~/components/custom/Page"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { defaultClientCache } from "~/lib/defaultClientCache"
-import { getMangasByParodyId, getParodyById } from "~/repositories/supabase"
+import {  getLanguageById,  getMangasByCharacterId } from "~/repositories/supabase"
 import { AlbumArtwork } from "../_index/components/album"
 
 export const loader = async (args: LoaderFunctionArgs) => {
-	const parodyId = args.params.parodyId
+	const languageId = args.params.languageId
 
-	if (!parodyId) {
+	if (!languageId) {
 		throw new Error("Author ID is required")
 	}
 
-	const mangasPromise = getMangasByParodyId(parodyId)
-	const parody = await getParodyById(parodyId)
+	const mangasPromise = getMangasByCharacterId(languageId)
+	const language = await getLanguageById(languageId)
 
 	return defer(
 		{
 			mangasPromise,
-			parody,
+			language,
 		},
 		{
 			headers: {
@@ -35,7 +36,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
-	const cacheKey = `/parodies/${args.params.parodyId}`
+	const cacheKey = `/languages/${args.params.languageId}`
 	return defaultClientCache(cacheKey, args)
 }
 
@@ -43,18 +44,18 @@ clientLoader.hydrate = true
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	return [
-		{ title: `parody | ${data?.parody?.title}` },
-		{ name: "description", content: `${data?.parody?.title}` },
+		{ title: `language | ${data?.language?.title}` },
+		{ name: "description", content: `${data?.language?.title}` },
 	]
 }
 
-export default function ParodyId() {
-	const { mangasPromise, parody } = useLoaderData<typeof loader>()
+export default function LanguageId() {
+	const { mangasPromise, language } = useLoaderData<typeof loader>()
 	return (
 		<Page>
 			<Card>
 				<CardHeader>
-					<CardTitle>{parody?.title}</CardTitle>
+					<CardTitle>{language.title}</CardTitle>
 				</CardHeader>
 				<CardContent>
 					<Suspense fallback={"carregando"}>
