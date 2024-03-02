@@ -1,7 +1,8 @@
-import { unstable_vitePlugin as remix } from "@remix-run/dev"
-import { defineConfig, type ViteDevServer } from "vite"
-import tsconfigPaths from "vite-tsconfig-paths"
+import { vitePlugin as remix } from "@remix-run/dev"
+import { vercelPreset } from "@vercel/remix/vite"
 import morgan from "morgan"
+import { type ViteDevServer, defineConfig } from "vite"
+import tsconfigPaths from "vite-tsconfig-paths"
 
 function morganPlugin() {
 	return {
@@ -15,5 +16,11 @@ function morganPlugin() {
 }
 
 export default defineConfig({
-	plugins: [remix(), tsconfigPaths(), morganPlugin()],
+	plugins: [
+		remix({
+			presets: [vercelPreset()],
+		}),
+		tsconfigPaths(),
+		morganPlugin(),
+	],
 })
