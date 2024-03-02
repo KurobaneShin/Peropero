@@ -1,9 +1,9 @@
-import { LoaderFunctionArgs, MetaFunction, defer } from "@remix-run/node"
 import {
 	Await,
 	ClientLoaderFunctionArgs,
 	useLoaderData,
 } from "@remix-run/react"
+import { LoaderFunctionArgs, MetaFunction, defer } from "@vercel/remix"
 import { Suspense } from "react"
 import Page from "~/components/custom/Page"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"

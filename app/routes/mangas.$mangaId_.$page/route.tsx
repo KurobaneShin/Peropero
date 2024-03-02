@@ -1,10 +1,10 @@
-import { LoaderFunctionArgs, MetaFunction, defer } from "@remix-run/node"
 import {
 	Await,
 	ClientLoaderFunctionArgs,
 	useLoaderData,
 	useParams,
 } from "@remix-run/react"
+import { LoaderFunctionArgs, MetaFunction, defer } from "@vercel/remix"
 import { Suspense } from "react"
 import { Skeleton } from "~/components/ui/skeleton"
 

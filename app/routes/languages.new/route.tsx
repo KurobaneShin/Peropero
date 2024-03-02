@@ -1,15 +1,11 @@
 import {
-	ActionFunctionArgs,
-	LoaderFunctionArgs,
-	redirect,
-} from "@remix-run/node"
-import {
 	ClientActionFunctionArgs,
 	Form,
 	useActionData,
 	useNavigate,
 	useNavigation,
 } from "@remix-run/react"
+import { ActionFunctionArgs, LoaderFunctionArgs, redirect } from "@vercel/remix"
 import { useEffect, useState } from "react"
 import { z } from "zod"
 import { FormControl } from "~/components/custom/FormControl"

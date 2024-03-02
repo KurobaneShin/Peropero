@@ -1,13 +1,13 @@
 import { Separator } from "@radix-ui/react-separator"
-import type { MetaFunction } from "@remix-run/node"
+import type { MetaFunction } from "@vercel/remix"
 
-import { defer } from "@remix-run/node"
 import {
 	Await,
 	ClientLoaderFunctionArgs,
 	Link,
 	useLoaderData,
 } from "@remix-run/react"
+import { defer } from "@vercel/remix"
 import { PlusCircleIcon } from "lucide-react"
 import { Suspense } from "react"
 import { Button } from "~/components/ui/button"

@@ -1,10 +1,4 @@
 import {
-	ActionFunctionArgs,
-	LoaderFunctionArgs,
-	defer,
-	redirect,
-} from "@remix-run/node"
-import {
 	Await,
 	ClientActionFunctionArgs,
 	ClientLoaderFunctionArgs,
@@ -15,6 +9,12 @@ import {
 	useLocation,
 	useNavigation,
 } from "@remix-run/react"
+import {
+	ActionFunctionArgs,
+	LoaderFunctionArgs,
+	defer,
+	redirect,
+} from "@vercel/remix"
 import React, { Suspense, useEffect, useState } from "react"
 import { z } from "zod"
 import { zfd } from "zod-form-data"

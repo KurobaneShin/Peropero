@@ -1,5 +1,5 @@
-import { type ActionFunctionArgs, redirect } from "@remix-run/node"
 import { Form, Link, useActionData } from "@remix-run/react"
+import { type ActionFunctionArgs, redirect } from "@vercel/remix"
 import { useRef, useState } from "react"
 import { z } from "zod"
 import { accessToken } from "~/cookies"

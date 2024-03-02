@@ -1,4 +1,4 @@
-import { redirect } from "@remix-run/node"
+import { redirect } from "@vercel/remix"
 import { jwtDecode } from "jwt-decode"
 import { accessToken } from "~/cookies"
 

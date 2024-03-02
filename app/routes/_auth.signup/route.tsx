@@ -1,6 +1,6 @@
 import Hcaptcha from "@hcaptcha/react-hcaptcha"
-import { type ActionFunctionArgs, redirect } from "@remix-run/node"
 import { Form, useActionData } from "@remix-run/react"
+import { type ActionFunctionArgs, redirect } from "@vercel/remix"
 import { ClassAttributes, LegacyRef, useRef, useState } from "react"
 import { z } from "zod"
 import { InputWithLabel } from "~/components/custom/inputWithLabel"
