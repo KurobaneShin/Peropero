@@ -1,4 +1,4 @@
-import { redirect } from "@remix-run/node"
+import { redirect } from "@vercel/remix"
 import { supabase } from "~/infra/supabase"
 
 export const loader = async () => {

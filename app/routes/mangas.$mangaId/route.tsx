@@ -1,4 +1,3 @@
-import { LoaderFunctionArgs, MetaFunction, defer } from "@remix-run/node"
 import {
 	Await,
 	ClientLoaderFunctionArgs,
@@ -6,6 +5,7 @@ import {
 	useLoaderData,
 	useParams,
 } from "@remix-run/react"
+import { LoaderFunctionArgs, MetaFunction, defer } from "@vercel/remix"
 import { Suspense } from "react"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"

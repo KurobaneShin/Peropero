@@ -1,8 +1,6 @@
-import { LoaderFunctionArgs } from "@remix-run/node"
 import {
 	Link,
 	Links,
-	LiveReload,
 	Meta,
 	Outlet,
 	Scripts,
@@ -10,6 +8,7 @@ import {
 	useLoaderData,
 	useNavigation,
 } from "@remix-run/react"
+import { LoaderFunctionArgs } from "@vercel/remix"
 import clsx from "clsx"
 import nProgress from "nprogress"
 import { useEffect } from "react"
@@ -98,7 +97,6 @@ function App() {
 				</div>
 
 				<ScrollRestoration />
-				<LiveReload />
 				<Scripts />
 			</body>
 		</html>

@@ -1,5 +1,5 @@
-import { LoaderFunctionArgs } from "@remix-run/node"
 import { Link, Outlet, useLoaderData, useLocation } from "@remix-run/react"
+import { LoaderFunctionArgs } from "@vercel/remix"
 import Page from "~/components/custom/Page"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"

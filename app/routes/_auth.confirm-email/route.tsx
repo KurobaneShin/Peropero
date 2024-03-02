@@ -1,4 +1,4 @@
-import { LoaderFunctionArgs } from "@remix-run/node"
+import { LoaderFunctionArgs } from "@vercel/remix"
 import { redirect } from "react-router"
 import { accessToken } from "~/cookies"
 import { supabase } from "~/infra/supabase"

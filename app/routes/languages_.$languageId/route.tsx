@@ -1,15 +1,17 @@
-
-import { LoaderFunctionArgs, MetaFunction, defer } from "@remix-run/node"
 import {
 	Await,
 	ClientLoaderFunctionArgs,
 	useLoaderData,
 } from "@remix-run/react"
+import { LoaderFunctionArgs, MetaFunction, defer } from "@vercel/remix"
 import { Suspense } from "react"
 import Page from "~/components/custom/Page"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { defaultClientCache } from "~/lib/defaultClientCache"
-import {  getLanguageById,  getMangasByCharacterId } from "~/repositories/supabase"
+import {
+	getLanguageById,
+	getMangasByCharacterId,
+} from "~/repositories/supabase"
 import { AlbumArtwork } from "../_index/components/album"
 
 export const loader = async (args: LoaderFunctionArgs) => {
