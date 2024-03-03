@@ -37,18 +37,11 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
 	const data = await getMangaTitle(mangaId)
 
-	return defer(
-		{
-			title: data.title,
-			page: pagePromise,
-			manga: getMangaDetails(mangaId),
-		},
-		{
-			headers: {
-				"Cache-Control": "max-age=60, public",
-			},
-		},
-	)
+	return defer({
+		title: data.title,
+		page: pagePromise,
+		manga: getMangaDetails(mangaId),
+	})
 }
 
 export const meta: MetaFunction<typeof loader> = ({ data, params }) => {
