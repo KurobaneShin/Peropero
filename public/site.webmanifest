@@ -1,0 +1,8 @@
+{
+  "name": "Peropero",
+  "short_name": "Peropero",
+  "start_url": "/",
+  "theme_color": "#A9ADC1",
+  "background_color": "#1f2028",
+  "display": "standalone"
+}

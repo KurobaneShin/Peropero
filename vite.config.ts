@@ -16,6 +16,9 @@ function morganPlugin() {
 }
 
 export default defineConfig({
+	build: {
+		cssMinify: process.env.NODE_ENV === "production",
+	},
 	plugins: [
 		remix({
 			presets: [vercelPreset()],
