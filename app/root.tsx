@@ -23,7 +23,7 @@ import { DrawerSidebar } from "./components/custom/drawerSidebar"
 import { ModeToggle } from "./components/custom/modeToggle"
 import { Button } from "./components/ui/button"
 import { accessToken, themeSessionResolver } from "./cookies"
-import tailwindStyleSheetUrl from "./globals.css"
+import tailwindStyleSheetUrl from "./globals.css?url"
 import { makeTimings } from "./lib/timing.server"
 import { combineHeaders } from "./lib/utils"
 import { Sidebar } from "./routes/_index/components/sidebar"
@@ -36,8 +36,8 @@ export const links: LinksFunction = () => {
 			rel: "manifest",
 			href: "/site.webmanifest",
 			crossOrigin: "use-credentials",
-		},
-	]
+		} as const,
+	].filter(Boolean)
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
