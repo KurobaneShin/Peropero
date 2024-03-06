@@ -8,7 +8,12 @@ import {
 	useLoaderData,
 	useNavigation,
 } from "@remix-run/react"
-import { LoaderFunctionArgs } from "@vercel/remix"
+import {
+	HeadersFunction,
+	LinksFunction,
+	LoaderFunctionArgs,
+	json,
+} from "@vercel/remix"
 import clsx from "clsx"
 import nProgress from "nprogress"
 import { useEffect } from "react"
@@ -18,19 +23,48 @@ import { DrawerSidebar } from "./components/custom/drawerSidebar"
 import { ModeToggle } from "./components/custom/modeToggle"
 import { Button } from "./components/ui/button"
 import { accessToken, themeSessionResolver } from "./cookies"
-import "./globals.css"
+import tailwindStyleSheetUrl from "./globals.css"
+import { makeTimings } from "./lib/timing.server"
+import { combineHeaders } from "./lib/utils"
 import { Sidebar } from "./routes/_index/components/sidebar"
+
+export const links: LinksFunction = () => {
+	return [
+		{ rel: "preload", href: tailwindStyleSheetUrl, as: "style" },
+		{ rel: "stylesheet", href: tailwindStyleSheetUrl },
+		{
+			rel: "manifest",
+			href: "/site.webmanifest",
+			crossOrigin: "use-credentials",
+		},
+	]
+}
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const { getTheme } = await themeSessionResolver(request)
+	const timings = makeTimings("root loader")
 
 	const session = await accessToken.getSession(request.headers.get("Cookie"))
 	const user = session.get("profile")
 
-	return {
-		theme: getTheme(),
-		user,
+	return json(
+		{
+			theme: getTheme(),
+			user,
+		},
+		{
+			headers: combineHeaders({
+				"Server-Timing": timings.toString(),
+			}),
+		},
+	)
+}
+
+export const headers: HeadersFunction = ({ loaderHeaders }) => {
+	const headers = {
+		"Server-Timing": loaderHeaders.get("Server-Timing") ?? "",
 	}
+	return headers
 }
 
 export default function AppWithProviders() {
