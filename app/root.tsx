@@ -28,6 +28,8 @@ import { makeTimings } from "./lib/timing.server"
 import { combineHeaders } from "./lib/utils"
 import { Sidebar } from "./routes/_index/components/sidebar"
 
+import "./globals.css"
+
 export const links: LinksFunction = () => {
 	return [
 		{ rel: "preload", href: tailwindStyleSheetUrl, as: "style" },
