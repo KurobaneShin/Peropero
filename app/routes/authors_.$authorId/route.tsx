@@ -21,17 +21,10 @@ export const loader = async (args: LoaderFunctionArgs) => {
 	const mangasPromise = getMangasBuAuthorId(authorId)
 	const author = await getAuthorById(authorId)
 
-	return defer(
-		{
-			mangasPromise,
-			author,
-		},
-		{
-			headers: {
-				"Cache-Control": "max-age=60, public",
-			},
-		},
-	)
+	return defer({
+		mangasPromise,
+		author,
+	})
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {

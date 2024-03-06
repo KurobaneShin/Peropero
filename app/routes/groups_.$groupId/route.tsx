@@ -21,17 +21,10 @@ export const loader = async (args: LoaderFunctionArgs) => {
 	const mangasPromise = getMangasByGroupId(groupId)
 	const group = await getGroupById(groupId)
 
-	return defer(
-		{
-			mangasPromise,
-			group,
-		},
-		{
-			headers: {
-				"Cache-Control": "max-age=60, public",
-			},
-		},
-	)
+	return defer({
+		mangasPromise,
+		group,
+	})
 }
 
 export async function clientLoader(args: ClientLoaderFunctionArgs) {
